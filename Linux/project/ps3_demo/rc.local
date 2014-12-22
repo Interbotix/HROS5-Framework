@@ -11,8 +11,7 @@
 #
 # By default this script does nothing.
 sleep 2
-sudo /21CRobotFramework/Linux/project/ps3_demo/demo &
+sudo /HROS5-Framework/Linux/project/ps3_demo/demo &
 sleep 3
 sudo pkill bluetoothd &
 exit 0
-
