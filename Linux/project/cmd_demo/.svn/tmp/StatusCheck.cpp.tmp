@@ -1,0 +1,402 @@
+/*
+ * StatusCheck.cpp
+ *
+ *  Created on: 2011. 1. 21.
+ *      Author: zerom
+ */
+
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+#include "StatusCheck.h"
+#include "Head.h"
+#include "Action.h"
+#include "Walking.h"
+#include "MotionStatus.h"
+#include "MotionManager.h"
+#include "LinuxActionScript.h"
+#include "PS3Controller.h"
+#include "PS3BallFollower.h"
+#include "Camera.h"
+
+using namespace Robot;
+
+int StatusCheck::m_cur_mode     = READY;
+int StatusCheck::m_old_btn      = 0;
+int StatusCheck::m_is_started   = 0;
+bool bLJState=false,bRJState=false;
+
+void StatusCheck::mPlay(int motion_page)
+{
+  Walking::GetInstance()->Stop();
+	while(Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+	m_cur_mode = SOCCER;      
+	MotionManager::GetInstance()->Reinitialize();
+  MotionManager::GetInstance()->SetEnable(true);
+  m_is_started = 1;
+  
+  Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+
+  Action::GetInstance()->Start(motion_page);
+  while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+	Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+	Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+
+	return;		
+}
+
+void StatusCheck::resetLEDs(CM730 &cm730)
+{
+	cm730.WriteWordDelayed(CM730::P_LED_EYE_L, cm730.MakeColor(31,0,18));        
+	cm730.WriteWordDelayed(CM730::P_LED_HEAD_L, cm730.MakeColor(1,1,1));
+	return;
+}
+
+
+void StatusCheck::Check(CM730 &cm730)
+{
+	//toggle stnadby		
+	if(PS3.key.PS != 0)
+		{
+		if(Walking::GetInstance()->IsRunning() == true)
+			{
+			Walking::GetInstance()->Stop();
+			while(Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+			}
+		
+		if(ToggleRobotStandby()==1)
+			{
+			//LinuxActionScript::PlayMP3("../../../Data/mp3/standby.mp3");
+			}		
+		// wait for key release
+		while(PS3.key.PS != 0) usleep(8000);		
+		}
+	if(robotInStandby == 1) return;	
+	if(MotionStatus::FALLEN != STANDUP && m_cur_mode == SOCCER && m_is_started == 1)
+  	{
+    Walking::GetInstance()->Stop();
+		resetLEDs(cm730);
+		while(Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+
+    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+
+    if(MotionStatus::FALLEN == FORWARD)
+        Action::GetInstance()->Start(10);   // FORWARD GETUP
+    else if(MotionStatus::FALLEN == BACKWARD)
+        Action::GetInstance()->Start(11);   // BACKWARD GETUP
+
+    while(Action::GetInstance()->IsRunning() == 1) usleep(8000);
+
+    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+		}
+	if(PS3BallFollower::GetInstance()->bFullAuto == false)
+		{
+		//shut it down		
+		if(PS3.key.Cross != 0)
+			{
+			resetLEDs(cm730);
+      Walking::GetInstance()->Stop();
+			while(Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+			m_is_started    = 0;
+      m_cur_mode      = READY;
+      LinuxActionScript::m_stop = 1;
+
+      Head::GetInstance()->m_Joint.SetEnableBody(false);
+      Walking::GetInstance()->m_Joint.SetEnableBody(false);
+      Action::GetInstance()->m_Joint.SetEnableBody(true);
+
+      while(Action::GetInstance()->Start(15) == false) usleep(8000);
+      while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+			while(PS3.key.Cross != 0) usleep(8000);			
+			}
+		//start		
+		if(PS3.key.Triangle != 0)
+			{
+			resetLEDs(cm730);
+		  Walking::GetInstance()->Stop();
+			while(Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+			m_cur_mode = SOCCER;      
+			MotionManager::GetInstance()->Reinitialize();
+      MotionManager::GetInstance()->SetEnable(true);
+      m_is_started = 1;
+      bLJState = bRJState = false;
+      Head::GetInstance()->m_Joint.SetEnableBody(false);
+      Walking::GetInstance()->m_Joint.SetEnableBody(false);
+      Action::GetInstance()->m_Joint.SetEnableBody(true);
+
+      Action::GetInstance()->Start(9);
+      while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+
+      Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true);
+      Action::GetInstance()->m_Joint.SetEnableBody(false);
+			usleep(50000);
+      Head::GetInstance()->m_Joint.SetEnableHeadOnly(true);
+			while(PS3.key.Triangle != 0) usleep(8000);			
+			}
+
+		//headstand		
+		if(PS3.key.Select != 0) 
+			mPlay(17);
+		//right kick		
+		if(PS3.key.R2 != 0) 
+			mPlay(12);
+		//left kick		
+		if(PS3.key.L2 != 0) 
+			mPlay(13);
+		//right pass		
+		if(PS3.key.R1 != 0) 
+			mPlay(70);
+		//left pass		
+		if(PS3.key.L1 != 0) 
+			mPlay(71);
+		//wave right_side		
+		if(PS3.key.Square != 0) 
+			{
+			mPlay(38);
+			}
+
+		if(Walking::GetInstance()->IsRunning() == true)
+			{
+			int x,y,x1,dead_band=6;			
+			double FBStep=0,RLTurn=0,RLStep=0;			
+			x = -(PS3.key.RJoyX-128);
+			y = -(PS3.key.RJoyY-128);
+			x1 = -(PS3.key.LJoyX-128);
+			if(abs(x) > dead_band || abs(y) > dead_band || abs(x1) > dead_band)
+				{
+				RLTurn = 60*(x-dead_band)/256;	
+				FBStep = 70*(y-dead_band)/256;//45		
+				if(FBStep < 0)
+					FBStep = 45*(y-dead_band)/256;							
+				if(bLJState == false)
+					RLStep = 52*(x1-dead_band)/256;		
+ 				}	    
+			Walking::GetInstance()->X_MOVE_AMPLITUDE = FBStep;
+			Walking::GetInstance()->Y_MOVE_AMPLITUDE = RLStep;
+			Walking::GetInstance()->A_MOVE_AMPLITUDE = RLTurn;			
+			}
+		}
+	else //things only done in auto mode
+		{
+		}
+
+	if(Walking::GetInstance()->IsRunning() == true && PS3.key.Down != 0)
+		{
+		//fprintf(stderr, "STOPPING\n");		
+		resetLEDs(cm730);
+		Walking::GetInstance()->Stop();
+		while(Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+		//while(Walking::GetInstance()->IsRunning() == true);
+	
+		}
+
+	if(Walking::GetInstance()->IsRunning() == false && PS3.key.Up != 0)
+		{
+		//fprintf(stderr, "STARTING\n");		
+		Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
+		Walking::GetInstance()->Y_MOVE_AMPLITUDE = 0;
+		Walking::GetInstance()->A_MOVE_AMPLITUDE = 0;
+		Walking::GetInstance()->Start();			
+		}
+
+	// toggle head from auto to not	
+	if(PS3.key.LeftHat != 0)
+		{
+		if(bLJState == true)
+			{
+			bLJState = false;
+			PS3BallFollower::GetInstance()->bHeadAuto = false;
+			//double pan,tilt;
+			//pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
+			//tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);	
+			//Head::GetInstance()->MoveByAngle(pan,tilt);
+			}
+		else
+			{
+			bLJState = true;
+			if(PS3BallFollower::GetInstance()->bFullAuto == true)
+				PS3BallFollower::GetInstance()->bHeadAuto = true;
+			else
+				PS3BallFollower::GetInstance()->bHeadAuto = false;
+			}
+		PS3Vibrate();		
+		// wait for key release
+		while(PS3.key.LeftHat != 0) usleep(8000);		
+		}
+	
+	if(PS3BallFollower::GetInstance()->bHeadAuto == false)
+		{
+		int x,y,dead_band=6;
+		double pan,tilt;
+		pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
+		tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);	
+		Point2D pos = Point2D(pan,tilt);
+		x = -(PS3.key.LJoyX-128);
+		y = -(PS3.key.LJoyY-128);
+		if(abs(x) > dead_band || abs(y) > dead_band)
+			{
+			pos.X = pan + 0.2*Camera::VIEW_V_ANGLE*(x-dead_band)/256;
+			pos.Y = tilt + 0.2*Camera::VIEW_H_ANGLE*(y-dead_band)/256;		
+			}
+		Head::GetInstance()->MoveByAngle(pos.X,pos.Y);			
+		//Head::GetInstance()->MoveTracking(pos);			
+		}
+	if(PS3.key.Start != 0)
+		{
+		resetLEDs(cm730);
+		if(PS3BallFollower::GetInstance()->bFullAuto == true)
+			{
+			PS3BallFollower::GetInstance()->bFullAuto = false;
+			PS3BallFollower::GetInstance()->bHeadAuto = false;
+			SetPS3LEDFlashRate(0);
+			bLJState = false;
+			}
+		else
+			{
+			PS3BallFollower::GetInstance()->bFullAuto = true;
+			PS3BallFollower::GetInstance()->bHeadAuto = true;
+			SetPS3LEDFlashRate(3);
+			bLJState = true;
+			}		
+		// wait for key release
+		while(PS3.key.Start != 0) usleep(8000);		
+		}	
+
+	if(m_old_btn == MotionStatus::BUTTON)
+      return;
+
+
+  m_old_btn = MotionStatus::BUTTON;
+
+  if(m_old_btn & BTN_MODE)
+    {
+    fprintf(stderr, "Mode button pressed.. \n");
+
+    if(m_is_started == 1)
+    	{
+      m_is_started    = 0;
+      m_cur_mode      = READY;
+      LinuxActionScript::m_stop = 1;
+
+      Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+
+      while(Action::GetInstance()->Start(15) == false) usleep(8000);
+      while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+    	}
+  	else
+    	{
+    	m_cur_mode++;
+    	if(m_cur_mode >= MAX_MODE) m_cur_mode = READY;
+    	}
+
+		MotionManager::GetInstance()->SetEnable(false);
+		usleep(10000);
+
+<<<<<<< .mine
+    if(m_cur_mode == READY)
+      {
+      cm730.WriteByte(CM730::P_LED_PANNEL, 0x01|0x02|0x04, NULL);
+    	LinuxActionScript::PlayMP3("../../../Data/mp3/ready.mp3");
+     	}
+    else if(m_cur_mode == SOCCER)
+      {
+      cm730.WriteByte(CM730::P_LED_PANNEL, 0x01, NULL);
+    	int value = cm730.MakeColor(14,14,0);
+    	cm730.WriteWord(CM730::P_LED_EYE_L, value, 0);        
+         LinuxActionScript::PlayMP3("../../../Data/mp3/Autonomous soccer mode.mp3");
+      }
+    else if(m_cur_mode == MOTION)
+      {
+      cm730.WriteByte(CM730::P_LED_PANNEL, 0x02, NULL);
+      LinuxActionScript::PlayMP3("../../../Data/mp3/Interactive motion mode.mp3");
+      }
+    else if(m_cur_mode == VISION)
+      {
+      cm730.WriteByte(CM730::P_LED_PANNEL, 0x04, NULL);
+      LinuxActionScript::PlayMP3("../../../Data/mp3/Vision processing mode.mp3");
+      }
+  	}
+=======
+                MotionManager::GetInstance()->ResetGyroCalibration();
+                while(1)
+                {
+                    if(MotionManager::GetInstance()->GetCalibrationStatus() == 1)
+                    {
+                        LinuxActionScript::PlayMP3("../../../Data/mp3/Sensor calibration complete.mp3");
+                        break;
+                    }
+                    else if(MotionManager::GetInstance()->GetCalibrationStatus() == -1)
+                    {
+                        LinuxActionScript::PlayMP3Wait("../../../Data/mp3/Sensor calibration fail.mp3");
+                        MotionManager::GetInstance()->ResetGyroCalibration();
+                    }
+                    usleep(8000);
+                }
+            }
+            else if(m_cur_mode == MOTION)
+            {
+                MotionManager::GetInstance()->Reinitialize();
+                MotionManager::GetInstance()->SetEnable(true);
+                m_is_started = 1;
+                LinuxActionScript::PlayMP3("../../../Data/mp3/Start motion demonstration.mp3");
+>>>>>>> .r70
+
+  if(m_old_btn & BTN_START)
+    {
+    if(m_is_started == 0)
+      {
+      fprintf(stderr, "Start button pressed.. & started is false.. \n");
+
+      if(m_cur_mode == SOCCER)
+        {
+        MotionManager::GetInstance()->Reinitialize();
+        MotionManager::GetInstance()->SetEnable(true);
+        m_is_started = 1;
+        LinuxActionScript::PlayMP3("../../../Data/mp3/Start soccer demonstration.mp3");
+
+        Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+
+        Action::GetInstance()->Start(9);
+        while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+
+        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+				usleep(50000);
+        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+				PS3BallFollower::GetInstance()->bFullAuto = true;
+				PS3BallFollower::GetInstance()->bHeadAuto = true;
+        }
+      else if(m_cur_mode == MOTION)
+        {
+        MotionManager::GetInstance()->Reinitialize();
+        MotionManager::GetInstance()->SetEnable(true);
+        m_is_started = 1;
+        LinuxActionScript::PlayMP3("../../../Data/mp3/Start motion demonstration.mp3");
+
+        // Joint Enable..
+        Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+
+        Action::GetInstance()->Start(1);
+        while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+        }
+      else if(m_cur_mode == VISION)
+        {
+        MotionManager::GetInstance()->Reinitialize();
+        MotionManager::GetInstance()->SetEnable(true);
+        m_is_started = 1;
+        LinuxActionScript::PlayMP3("../../../Data/mp3/Start vision processing demonstration.mp3");
+
+        // Joint Enable...
+        Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+
+        Action::GetInstance()->Start(1);
+        while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+        }
+      }
+    else
+      {
+      fprintf(stderr, "Start button pressed.. & started is true.. \n");
+      }
+    }
+}

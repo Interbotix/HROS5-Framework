@@ -1,0 +1,5 @@
+#!/bin/sh -e
+sleep 2
+sudo /21CRobotFramework/Linux/project/ps3_demo/demo &
+sleep 3
+sudo pkill bluetoothd &
