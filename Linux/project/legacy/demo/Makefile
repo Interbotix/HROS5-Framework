@@ -12,9 +12,9 @@ TARGET = demo
 INCLUDE_DIRS = -I../../include -I../../../Framework/include
 
 CXX = g++
-CXXFLAGS += -g -O2 -DLINUX -Wall $(INCLUDE_DIRS)
+CXXFLAGS += -O2 -DLINUX -Wall $(INCLUDE_DIRS)
 #CXXFLAGS += -O2 -DDEBUG -DLINUX -Wall $(INCLUDE_DIRS)
-LFLAGS += -g -lpthread -ljpeg -lrt -lbluetooth
+LFLAGS += -lpthread -ljpeg -lrt
 
 OBJECTS = VisionMode.o StatusCheck.o main.o
 
@@ -32,7 +32,7 @@ darwin.a:
 	make -C ../../build
 
 $(TARGET): darwin.a $(OBJECTS)
-	$(CXX) $(CFLAGS) $(OBJECTS) ../../lib/darwin.a -o $(TARGET) $(LFLAGS)
+	$(CXX) $(CFLAGS) $(LFLAGS) $(OBJECTS) ../../lib/darwin.a -o $(TARGET)
 	chmod 755 $(TARGET)
 
 # useful to make a backup "make tgz"
