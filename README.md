@@ -16,4 +16,41 @@ Maintainer
 * Email: andrew@trossenrobotics.com
 * Github: AlterRobotics
 * Website: http://www.trossenrobotics.com
+* 
+Notes
+==================
+* Operating systems supported & verified: Ubuntu 12.04 & 14.04 LTS, Yocto Poky 1.6 OpenEmbedded Linux
+* This modified framework currently supports the CM-730 Subcontroller from Robotis, but runs a custom firmware version authored by Farrell Robotics. Please update firmware of your CM-730 to custom version 13 available in /Linux/project/firmware_installer if you are using a CM-730 Subcontroller. Arbotix-Pro support will have its own firmware.
+* ps3_demo has no state engine for switching between walking, action, and sitting modes. Read through code carefully and be EXTREMELY cautious with button commands, as they may cause the robot to become unstable. DO NOT execute any button commands from a sitting position. Triangle button initializes into Walk-Ready, which can then be used as a starting point for action motions. PS3 button layout coming soon.
+* ps3_demo does not currently work for BlueZ5. For BlueZ4, sixad -s must be launched at startup (ie: rc.local). Requires pairing via sixpair. See Wiki for more information. PS3controller library authored by Farrell Robotics.
+* rme (robot motion editor) is an improved version of action_editor,  authored by Farrell Robotics. Additional features such as individual limb on/off torque control implemented (see wiki). Robot MUST be in sitting position and/or spotted when launching rme, as servos go into low-torque mode upon launching rme followed by the robot sitting down. Currently rme is the only way to create motion pages/files.
+* Autonomous blob tracking demos/Vision modules from original Darwin-OP framework have been disabled.
+
+TODO
+=================
+* Test/Finalize api_wrapper & node.js server
+* Finish cmd_demo for Arbotix Commander interface example program
+* ps3_demo (USE WITH CAUTION) needs mode check for sitting, button layout documentation. 
+* Update firmware_installer with proper MX-106/MX-64T firmware binaries and support.
+* MX-28 library update to MX-64/106, support for multiple servo types.
+* Adjust torque scaling with voltage.
+* Support for Arbotix-PRO replacement for CM-730 subcontroller
+* Fix character garbage in rme
+
+
+Ubuntu Build Notes
+==================
+Core library & Project dependencies:
+sudo apt-get install build-essential libncurses5-dev libjpeg-dev mplayer mplayer-skins 
+
+Bluetooth/ps3_demo dependencies:
+sudo apt-get install bluez-utils bluez-compat bluez-hcidump libusb-dev libbluetooth-dev joystick
+
+Make Instructions
+=================
+'make all' in /Linux/build to compile core framework libraries.
+
+'make clean && make all' in /Linux/build any time changes are made to core libraries.
+
+demos & utils are found in /Linux/project 'make clean && make all' in respective folders to compile project executables
 
