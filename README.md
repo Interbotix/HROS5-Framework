@@ -39,11 +39,5 @@ TODO
 * Support for Arbotix-PRO replacement for CM-730 subcontroller
 * Fix character garbage in rme
 
-Make Instructions
-=================
-'make all' in /Linux/build to compile core framework libraries.
 
-'make clean && make all' in /Linux/build any time changes are made to core libraries.
-
-demos & utils are found in /Linux/project 'make clean && make all' in respective folders to compile project executables
 
