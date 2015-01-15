@@ -18,7 +18,7 @@ Maintainer
 * Email: andrew@trossenrobotics.com
 * Github: AlterRobotics
 * Website: http://www.trossenrobotics.com
-* 
+
 Notes
 ==================
 * Operating systems supported & verified: Ubuntu 12.04 & 14.04 LTS, Yocto Poky 1.6 OpenEmbedded Linux
