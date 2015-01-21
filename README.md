@@ -1,9 +1,11 @@
 HROS5-Framework
 ===============
 
-HROS5-Framework, based on Darwin-OP framework, is a collaborative software project based on the open source Darwin-OP Framework, with the intent to continue development, implement an API to expose higher level functions of the framework, and develop additional features. This software is intended to be deployed on the [HR-OS5 Humanoid Research Robot](http://www.trossenrobotics.com/HR-OS5).
+HROS5-Framework, based on Darwin-OP framework, is a collaborative software project based on the open source Darwin-OP Framework, with the intent to continue development, implement an API to expose higher level functions of the framework, and develop additional features. 
 
-Please visit the [HROS5-Framework Github Wiki](https://github.com/Interbotix/HROS5-Framework/wiki) for more information on using this software and robotics platform.
+This Framework was intended to be deployed on the [HR-OS5 Humanoid Research Robot](http://www.trossenrobotics.com/HR-OS5).
+
+**Please visit the [HROS5-Framework Github Wiki](https://github.com/Interbotix/HROS5-Framework/wiki) for more information on using this software and robotics platform.**
 
 Contributions & authoring to codebase provided by Trossen Robotics, Farrell Robotics, AlterRobotics, Zerom, ROBOTIS, KevinO, KurtE. A special thanks to Farrell Robotics, a massive contributor and resource for humanoid robots & additions to the Darwin-OP framework. 
 
