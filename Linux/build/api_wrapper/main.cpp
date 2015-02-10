@@ -160,6 +160,7 @@ void NewAction(std::string name) {
 
 // get page number associated with name of action
 int GetPageNumber(std::string name) {
+    return -1;
 }
 
 
@@ -264,6 +265,7 @@ void MoveHeadByAngle(double pan, double tilt) {
 ****************************************/
 // check all servos and return failing servo or return value
 int CheckServos() {
+    return -1;
 }
 
 // check battery and return volt value or if below value, sit robot
@@ -277,6 +279,8 @@ int BatteryVoltLevel() {
     {
         return voltage;
     }
+    // failed, no read from cm730
+    return -1;
 }
 
 // check servo heat value and return or sit if above value
@@ -307,7 +311,7 @@ extern "C" {
     // void MoveHeadByAngleJS(double pan, double tilt)
     //                    {MoveHeadByAngle(pan, tilt);}
     // Diagnostic
-    int CheckServosJS() {CheckServos();}
+    int CheckServosJS() {return CheckServos();}
     int BatteryVoltLevelJS() {return BatteryVoltLevel();}
     // Sensors
 }
