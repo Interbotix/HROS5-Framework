@@ -7,7 +7,7 @@ This Framework was intended to be deployed on the [HR-OS5 Humanoid Research Robo
 
 **Please visit the [HROS5-Framework Github Wiki](https://github.com/Interbotix/HROS5-Framework/wiki) for more information on using this software and robotics platform.**
 
-Contributions & authoring to codebase provided by Trossen Robotics, Farrell Robotics, AlterRobotics, Zerom, ROBOTIS, KevinO, KurtE. A special thanks to Farrell Robotics, a massive contributor and resource for humanoid robots & additions to the Darwin-OP framework. 
+Contributions & authoring to codebase provided by Farrell Robotics, Interbotix, DresnerRobotics, Zerom, ROBOTIS, KevinO, KurtE. A special thanks to Farrell Robotics, a massive contributor and resource for humanoid robots & additions to the Darwin-OP framework. 
 
 All code within project is GPL GNU v3.
 
@@ -16,9 +16,9 @@ https://sourceforge.net/projects/darwinop/
 
 Maintainer
 =================
-* Name: Andrew Alter
+* Name: Andrew Dresner
 * Email: andrew@trossenrobotics.com
-* Github: AlterRobotics
+* Github: DresnerRobotics
 * Website: http://www.trossenrobotics.com
 
 Notes
@@ -35,7 +35,6 @@ TODO
 * Test/Finalize api_wrapper & node.js server
 * Finish cmd_demo for Arbotix Commander interface example program
 * ps3_demo (USE WITH CAUTION) needs mode check for sitting, button layout documentation. 
-* Update firmware_installer with proper MX-106/MX-64T firmware binaries and support.
 * MX-28 library update to MX-64/106, support for multiple servo types.
 * Adjust torque scaling with voltage.
 * Support for Arbotix-PRO replacement for CM-730 subcontroller
