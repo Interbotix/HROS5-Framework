@@ -181,5 +181,5 @@ int main(int argc, char *argv[])
     }
 
     DrawEnding();
-    return 0;
+    exit(0);
 }

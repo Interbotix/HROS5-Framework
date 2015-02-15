@@ -7,7 +7,7 @@ Use make to build necessary files
 
 Connect to robot (via ssh-wifi or screen-uart) and open terminal window
 ```bash
-cd /path/to/api/wrapper
+cd /path/to/api_wrapper
 ```
 then make
 ```bash

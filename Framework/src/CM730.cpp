@@ -8,6 +8,7 @@
 #include "FSR.h"
 #include "CM730.h"
 #include "MotionStatus.h"
+#include <stdlib.h>
 
 using namespace Robot;
 
@@ -69,6 +70,7 @@ CM730::CM730(PlatformCM730 *platform)
 CM730::~CM730()
 {
 	Disconnect();
+	exit(0);
 }
 
 int CM730::TxRxPacket(unsigned char *txpacket, unsigned char *rxpacket, int priority)

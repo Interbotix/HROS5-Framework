@@ -63,23 +63,23 @@ int main(int argc, char *argv[])
         if(ch != 'y')
         {
             printf("\n");
-            return 0;
+            exit(0);
         }
 
         if(Action::GetInstance()->CreateFile(filename) == false)
         {
             printf("Fail to create %s\n", filename);
-            return 0;
+            exit(0);
         }
     }
     ////////////////////////////////////////////////////////////
 
-  	PS3Controller_Start();
+  //	PS3Controller_Start();
   //////////////////// Framework Initialize ////////////////////////////	
     if(MotionManager::GetInstance()->Initialize(&cm730) == false)
     {
         printf("Initializing Motion Manager failed!\n");
-        return 0;
+        exit(0);
     }
        MotionManager::GetInstance()->SetEnable(false);
        MotionManager::GetInstance()->AddModule((MotionModule*)Action::GetInstance());	
@@ -321,5 +321,5 @@ int main(int argc, char *argv[])
 
     DrawEnding();
 
-    return 0;
+    exit(0);
 }

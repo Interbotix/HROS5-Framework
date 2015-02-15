@@ -30,8 +30,8 @@ MotionManager::MotionManager() :
         m_IsRunning(false),
         m_IsThreadRunning(false),
         m_IsLogging(false),
-				m_torqueAdaptionCounter(TORQUE_ADAPTION_CYCLES),
-				m_voltageAdaptionFactor(1.0),
+		m_torqueAdaptionCounter(TORQUE_ADAPTION_CYCLES),
+		m_voltageAdaptionFactor(1.0),
         DEBUG_PRINT(false)
 {
     for(int i = 0; i < JointData::NUMBER_OF_JOINTS; i++)
