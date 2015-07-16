@@ -16,15 +16,13 @@
 
 #include "StatusCheck.h"
 
-#ifdef MX28_1024
-#define MOTION_FILE_PATH    ((char *)"../../../Data/motion_1024.bin")
-#else
+
 #define MOTION_FILE_PATH    ((char *)"../../../Data/motion_4096.bin")
-#endif
+
 #define INI_FILE_PATH       ((char *)"../../../Data/config.ini")
 
 #define M_INI	((char *)"../../../Data/slow-walk.ini")
-#define SCRIPT_FILE_PATH    "script.asc"
+
 
 #define U2D_DEV_NAME0       "/dev/ttyUSB0"
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
@@ -90,29 +88,15 @@ int main(int argc, char *argv[])
 				if(retry >=3) exit(1);// if we can't do it after 3 attempts its not going to work.
     }
 
-    if(0 < firm_ver && firm_ver < 27)
+    if(0 < firm_ver && firm_ver < 40)
     {
-#ifdef MX28_1024
         Action::GetInstance()->LoadFile(MOTION_FILE_PATH);
-#else
-        fprintf(stderr, "MX-28's firmware is not support 4096 resolution!! \n");
-        fprintf(stderr, "Upgrade MX-28's firmware to version 27(0x1B) or higher.\n\n");
-        exit(0);
-#endif
-    }
-    else if(27 <= firm_ver)
-    {
-#ifdef MX28_1024
-        fprintf(stderr, "MX-28's firmware is not support 1024 resolution!! \n");
-        fprintf(stderr, "Remove '#define MX28_1024' from 'MX28.h' file and rebuild.\n\n");
-        exit(0);
-#else
-        Action::GetInstance()->LoadFile(MOTION_FILE_PATH);
-#endif
     }
     else
+	{
+	fprintf(stderr, "Wrong firmware version %d!! \n\n", JointData::ID_HEAD_PAN);	
         exit(0);
-
+	}
 		//conversion! ////////////////
 		/*
 		Action::GetInstance()->LoadFile("../../../Data/motion.bin");
