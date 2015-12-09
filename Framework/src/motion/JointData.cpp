@@ -5,7 +5,7 @@
  *
  */
 
-#include "MX28.h"
+#include "MXDXL.h"
 #include "JointData.h"
 #include "MotionManager.h"
 
@@ -16,7 +16,7 @@ JointData::JointData()
     for (int i = 0; i < NUMBER_OF_JOINTS; i++)
         {
             m_Enable[i] = true;
-            m_Value[i] = MX28::CENTER_VALUE;
+            m_Value[i] = MXDXL::CENTER_VALUE;
             m_Angle[i] = 0.0;
             m_CWSlope[i] = SLOPE_DEFAULT;
             m_CCWSlope[i] = SLOPE_DEFAULT;
@@ -177,13 +177,13 @@ bool JointData::GetEnable(int id)
 
 void JointData::SetValue(int id, int value)
 {
-    if (value < MX28::MIN_VALUE)
-        value = MX28::MIN_VALUE;
-    else if (value >= MX28::MAX_VALUE)
-        value = MX28::MAX_VALUE;
+    if (value < MXDXL::MIN_VALUE)
+        value = MXDXL::MIN_VALUE;
+    else if (value >= MXDXL::MAX_VALUE)
+        value = MXDXL::MAX_VALUE;
 
     m_Value[id] = value;
-    m_Angle[id] = MX28::Value2Angle(value);
+    m_Angle[id] = MXDXL::Value2Angle(value);
 }
 
 int JointData::GetValue(int id)
@@ -193,13 +193,13 @@ int JointData::GetValue(int id)
 
 void JointData::SetAngle(int id, double angle)
 {
-    if (angle < MX28::MIN_ANGLE)
-        angle = MX28::MIN_ANGLE;
-    else if (angle > MX28::MAX_ANGLE)
-        angle = MX28::MAX_ANGLE;
+    if (angle < MXDXL::MIN_ANGLE)
+        angle = MXDXL::MIN_ANGLE;
+    else if (angle > MXDXL::MAX_ANGLE)
+        angle = MXDXL::MAX_ANGLE;
 
     m_Angle[id] = angle;
-    m_Value[id] = MX28::Angle2Value(angle);
+    m_Value[id] = MXDXL::Angle2Value(angle);
 }
 
 double JointData::GetAngle(int id)

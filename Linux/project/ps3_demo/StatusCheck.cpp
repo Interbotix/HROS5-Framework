@@ -38,7 +38,7 @@ minIni* StatusCheck::m_ini1;
 
 //#define Southpaw
 
-void StatusCheck::Check(CM730 &cm730)
+void StatusCheck::Check(ArbotixPro &arbotixpro)
 {
 	int value = 0;
 
@@ -115,7 +115,7 @@ void StatusCheck::Check(CM730 &cm730)
 		{
 			if (m_is_started == 0)
 				{
-					cm730.DXLPowerOn(true);
+					arbotixpro.DXLPowerOn(true);
 				}
 			Walking::GetInstance()->Stop();
 			while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);

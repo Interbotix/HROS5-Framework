@@ -1,7 +1,7 @@
 ###############################################################
 #
-# Purpose: Makefile for "DARwIn Linux Framework"
-# Author.: robotis
+# Purpose: Makefile for "DARwIn/HROS Linux Framework"
+# Author.: robotis & interbotix
 # Version: 0.1
 # License: GPL
 #
@@ -19,7 +19,7 @@ CXXFLAGS += -fPIC -shared -O2 -DLINUX -D_GNU_SOURCE -Wall -g $(INCLUDE_DIRS)
 #CXXFLAGS += -O2 -DDEBUG -DLINUX -D_GNU_SOURCE -Wall -shared $(INCLUDE_DIRS)
 LFLAGS += -g -lpthread -ldl -lbluetooth -lncurses
 
-OBJS =  ../../Framework/src/CM730.o     	\
+OBJS =  ../../Framework/src/ArbotixPro.o     	\
         ../../Framework/src/math/Matrix.o   \
         ../../Framework/src/math/Plane.o    \
         ../../Framework/src/math/Point.o    \
@@ -46,13 +46,12 @@ OBJS =  ../../Framework/src/CM730.o     	\
         ../../Framework/src/vision/ImgProcess.o 	\
         ../../Framework/src/minIni/minIni.o	\
         ../../Framework/src/controller/PS3Controller.o	\
-        ../../Framework/src/commander/SerialInputCommander.o	\
         streamer/httpd.o           \
         streamer/jpeg_utils.o      \
         streamer/mjpg_streamer.o   \
         LinuxActionScript.o   \
         LinuxCamera.o   \
-        LinuxCM730.o    \
+        LinuxArbotixPro.o    \
         LinuxMotionTimer.o    \
         LinuxNetwork.o
 

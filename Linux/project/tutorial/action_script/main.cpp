@@ -19,13 +19,13 @@
 #include "Action.h"
 #include "Head.h"
 #include "Walking.h"
-#include "MX28.h"
+#include "MXDXL.h"
 #include "MotionManager.h"
 #include "LinuxMotionTimer.h"
-#include "LinuxCM730.h"
+#include "LinuxArbotixPro.h"
 #include "LinuxActionScript.h"
 
-#ifdef MX28_1024
+#ifdef MXDXL_1024
 #define MOTION_FILE_PATH    "../../../../Data/motion_1024.bin"
 #else
 #define MOTION_FILE_PATH    "../../../../Data/motion_4096.bin"
@@ -47,9 +47,9 @@ int main(void)
     Action::GetInstance()->LoadFile(MOTION_FILE_PATH);
 
     //////////////////// Framework Initialize ////////////////////////////
-    LinuxCM730 linux_cm730("/dev/ttyUSB0");
-    CM730 cm730(&linux_cm730);
-    if (MotionManager::GetInstance()->Initialize(&cm730) == false)
+    LinuxArbotixPro linux_arbotixpro("/dev/ttyUSB0");
+    ArbotixPro arbotixpro(&linux_arbotixpro);
+    if (MotionManager::GetInstance()->Initialize(&arbotixpro) == false)
         {
             printf("Fail to initialize Motion Manager!\n");
             return 0;

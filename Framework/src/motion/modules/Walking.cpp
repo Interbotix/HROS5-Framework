@@ -8,7 +8,7 @@
 #include <math.h>
 #include "Vector.h"
 #include "Matrix.h"
-#include "MX28.h"
+#include "MXDXL.h"
 #include "MotionStatus.h"
 #include "Kinematics.h"
 #include "Walking.h"
@@ -277,7 +277,7 @@ void Walking::update_param_time()
     m_Phase_Time2 = (m_SSP_Time_Start_R + m_SSP_Time_End_L) / 2;
     m_Phase_Time3 = (m_SSP_Time_End_R + m_SSP_Time_Start_R) / 2;
 
-    m_Pelvis_Offset = PELVIS_OFFSET * MX28::RATIO_ANGLE2VALUE;
+    m_Pelvis_Offset = PELVIS_OFFSET * MXDXL::RATIO_ANGLE2VALUE;
     m_Pelvis_Swing = m_Pelvis_Offset * 0.35;
     m_Arm_Swing_Gain = ARM_SWING_GAIN;
 }
@@ -328,7 +328,7 @@ void Walking::update_param_balance()
     m_R_Offset = R_OFFSET * PI / 180.0;
     m_P_Offset = P_OFFSET * PI / 180.0;
     m_A_Offset = A_OFFSET * PI / 180.0;
-    m_Hip_Pitch_Offset = HIP_PITCH_OFFSET * MX28::RATIO_ANGLE2VALUE;
+    m_Hip_Pitch_Offset = HIP_PITCH_OFFSET * MXDXL::RATIO_ANGLE2VALUE;
 }
 
 void Walking::Initialize()
@@ -593,15 +593,15 @@ void Walking::Process()
     // Compute motor value
     for (int i = 0; i < 14; i++)
         {
-            offset = (double)dir[i] * angle[i] * MX28::RATIO_ANGLE2VALUE;
+            offset = (double)dir[i] * angle[i] * MXDXL::RATIO_ANGLE2VALUE;
             if (i == 1) // R_HIP_ROLL
                 offset += (double)dir[i] * pelvis_offset_r;
             else if (i == 7) // L_HIP_ROLL
                 offset += (double)dir[i] * pelvis_offset_l;
             else if (i == 2 || i == 8) // R_HIP_PITCH or L_HIP_PITCH
-                offset -= (double)dir[i] * HIP_PITCH_OFFSET * MX28::RATIO_ANGLE2VALUE;
+                offset -= (double)dir[i] * HIP_PITCH_OFFSET * MXDXL::RATIO_ANGLE2VALUE;
 
-            outValue[i] = MX28::Angle2Value(initAngle[i]) + (int)offset;
+            outValue[i] = MXDXL::Angle2Value(initAngle[i]) + (int)offset;
         }
 
     // adjust balance offset

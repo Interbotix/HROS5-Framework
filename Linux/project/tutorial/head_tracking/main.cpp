@@ -44,9 +44,9 @@ int main(void)
     httpd::ball_finder = &tracker.finder;
 
     //////////////////// Framework Initialize ////////////////////////////
-    LinuxCM730 linux_cm730(U2D_DEV_NAME);
-    CM730 cm730(&linux_cm730);
-    if (MotionManager::GetInstance()->Initialize(&cm730) == false)
+    LinuxArbotixPro linux_arbotixpro(U2D_DEV_NAME);
+    ArbotixPro arbotixpro(&linux_arbotixpro);
+    if (MotionManager::GetInstance()->Initialize(&arbotixpro) == false)
         {
             printf("Fail to initialize Motion Manager!\n");
             return 0;

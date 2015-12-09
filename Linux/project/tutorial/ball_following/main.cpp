@@ -49,9 +49,9 @@ int main(void)
 	follower.DEBUG_PRINT = true;
 
 	//////////////////// Framework Initialize ////////////////////////////
-	LinuxCM730 linux_cm730(U2D_DEV_NAME);
-	CM730 cm730(&linux_cm730);
-	if (MotionManager::GetInstance()->Initialize(&cm730) == false)
+	LinuxArbotixPro linux_arbotixpro(U2D_DEV_NAME);
+	ArbotixPro arbotixpro(&linux_arbotixpro);
+	if (MotionManager::GetInstance()->Initialize(&arbotixpro) == false)
 		{
 			printf("Fail to initialize Motion Manager!\n");
 			return 0;
@@ -79,12 +79,12 @@ int main(void)
 				wDistance = 8;
 
 			param[n++] = id;
-			param[n++] = CM730::GetLowByte(wGoalPosition);
-			param[n++] = CM730::GetHighByte(wGoalPosition);
-			param[n++] = CM730::GetLowByte(wDistance);
-			param[n++] = CM730::GetHighByte(wDistance);
+			param[n++] = ArbotixPro::GetLowByte(wGoalPosition);
+			param[n++] = ArbotixPro::GetHighByte(wGoalPosition);
+			param[n++] = ArbotixPro::GetLowByte(wDistance);
+			param[n++] = ArbotixPro::GetHighByte(wDistance);
 		}
-	cm730.SyncWrite(MX28::P_GOAL_POSITION_L, 5, JointData::NUMBER_OF_JOINTS - 1, param);
+	arbotixpro.SyncWrite(MXDXL::P_GOAL_POSITION_L, 5, JointData::NUMBER_OF_JOINTS - 1, param);
 
 	printf("Press the ENTER key to begin!\n");
 	getchar();
