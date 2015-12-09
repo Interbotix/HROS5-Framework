@@ -21,5 +21,5 @@ extern Commander command;
 
 int main()
 {
-    command.ControlTest();
+	command.ControlTest();
 }

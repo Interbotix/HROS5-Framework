@@ -13,18 +13,18 @@ using namespace Robot;
 
 JointData::JointData()
 {
-    for(int i=0; i<NUMBER_OF_JOINTS; i++)
-    {
-        m_Enable[i] = true;
-        m_Value[i] = MX28::CENTER_VALUE;
-        m_Angle[i] = 0.0;
-        m_CWSlope[i] = SLOPE_DEFAULT;
-        m_CCWSlope[i] = SLOPE_DEFAULT;
-        m_PGain[i] = P_GAIN_DEFAULT;
-        m_IGain[i] = I_GAIN_DEFAULT;
-        m_DGain[i] = D_GAIN_DEFAULT;
-	m_Temp[i] = TEMP_DEFAULT;
-    }
+    for (int i = 0; i < NUMBER_OF_JOINTS; i++)
+        {
+            m_Enable[i] = true;
+            m_Value[i] = MX28::CENTER_VALUE;
+            m_Angle[i] = 0.0;
+            m_CWSlope[i] = SLOPE_DEFAULT;
+            m_CCWSlope[i] = SLOPE_DEFAULT;
+            m_PGain[i] = P_GAIN_DEFAULT;
+            m_IGain[i] = I_GAIN_DEFAULT;
+            m_DGain[i] = D_GAIN_DEFAULT;
+            m_Temp[i] = TEMP_DEFAULT;
+        }
 }
 
 JointData::~JointData()
@@ -38,7 +38,7 @@ void JointData::SetEnable(int id, bool enable)
 
 void JointData::SetEnable(int id, bool enable, bool exclusive)
 {
-    if(enable && exclusive) MotionManager::GetInstance()->SetJointDisable(id);
+    if (enable && exclusive) MotionManager::GetInstance()->SetJointDisable(id);
     m_Enable[id] = enable;
 }
 
@@ -49,9 +49,9 @@ void JointData::SetEnableHeadOnly(bool enable)
 
 void JointData::SetEnableHeadOnly(bool enable, bool exclusive)
 {
-	SetEnable(ID_HEAD_PAN,          enable, exclusive);
-	SetEnable(ID_HEAD_TILT,         enable, exclusive);
-//	SetEnable(ID_TORSO_ROTATE,	enable, exclusive);
+    SetEnable(ID_HEAD_PAN,          enable, exclusive);
+    SetEnable(ID_HEAD_TILT,         enable, exclusive);
+//  SetEnable(ID_TORSO_ROTATE,  enable, exclusive);
 }
 
 void JointData::SetEnableRightArmOnly(bool enable)
@@ -64,9 +64,9 @@ void JointData::SetEnableRightArmOnly(bool enable, bool exclusive)
     SetEnable(ID_R_SHOULDER_PITCH,  enable, exclusive);
     SetEnable(ID_R_SHOULDER_ROLL,   enable, exclusive);
     SetEnable(ID_R_ELBOW,           enable, exclusive);
-//	SetEnable(ID_R_ELBOW_YAW, 	enable, exclusive);
-//	SetEnable(ID_R_WRIST_YAW,	enable, exclusive);
-//	SetEnable(ID_R_GRIPPER,		enable, exclusive);
+//  SetEnable(ID_R_ELBOW_YAW,   enable, exclusive);
+//  SetEnable(ID_R_WRIST_YAW,   enable, exclusive);
+//  SetEnable(ID_R_GRIPPER,     enable, exclusive);
 }
 
 void JointData::SetEnableLeftArmOnly(bool enable)
@@ -79,9 +79,9 @@ void JointData::SetEnableLeftArmOnly(bool enable, bool exclusive)
     SetEnable(ID_L_SHOULDER_PITCH,  enable, exclusive);
     SetEnable(ID_L_SHOULDER_ROLL,   enable, exclusive);
     SetEnable(ID_L_ELBOW,           enable, exclusive);
-//	SetEnable(ID_L_ELBOW_YAW, 	enable, exclusive);
-//	SetEnable(ID_L_WRIST_YAW,	enable, exclusive);
-//	SetEnable(ID_L_GRIPPER,		enable, exclusive);
+//  SetEnable(ID_L_ELBOW_YAW,   enable, exclusive);
+//  SetEnable(ID_L_WRIST_YAW,   enable, exclusive);
+//  SetEnable(ID_L_GRIPPER,     enable, exclusive);
 }
 
 void JointData::SetEnableRightLegOnly(bool enable)
@@ -156,7 +156,7 @@ void JointData::SetEnableBody(bool enable)
 
 void JointData::SetEnableBody(bool enable, bool exclusive)
 {
-    for(int id = JointData::ID_MIN; id <= JointData::ID_MAX; id++)
+    for (int id = JointData::ID_MIN; id <= JointData::ID_MAX; id++)
         SetEnable(id, enable, exclusive);
 }
 
@@ -167,9 +167,9 @@ bool JointData::GetEnable(int id)
 
 void JointData::SetValue(int id, int value)
 {
-    if(value < MX28::MIN_VALUE)
+    if (value < MX28::MIN_VALUE)
         value = MX28::MIN_VALUE;
-    else if(value >= MX28::MAX_VALUE)
+    else if (value >= MX28::MAX_VALUE)
         value = MX28::MAX_VALUE;
 
     m_Value[id] = value;
@@ -183,9 +183,9 @@ int JointData::GetValue(int id)
 
 void JointData::SetAngle(int id, double angle)
 {
-    if(angle < MX28::MIN_ANGLE)
+    if (angle < MX28::MIN_ANGLE)
         angle = MX28::MIN_ANGLE;
-    else if(angle > MX28::MAX_ANGLE)
+    else if (angle > MX28::MAX_ANGLE)
         angle = MX28::MAX_ANGLE;
 
     m_Angle[id] = angle;
