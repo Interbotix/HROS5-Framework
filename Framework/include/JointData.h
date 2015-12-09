@@ -37,22 +37,38 @@ namespace Robot
 				ID_L_ANKLE_ROLL         = 18,
 				ID_HEAD_PAN             = 19,
 				ID_HEAD_TILT            = 20,
-//			ID_R_ELBOW_YAW		= 21,
-//			ID_L_ELBOW_YAW		= 22,
-//			ID_R_WRIST_YAW		= 23,
-//			ID_L_WRIST_YAW		= 24,
-//			ID_R_GRIPPER		= 25,
-//			ID_L_GRIPPER		= 26,
-//			ID_TORSO_ROTATE		= 23,
+
+//				ID_R_SHOULDER_PITCH_RIG	= 21,
+//				ID_L_SHOULDER_PITCH_RIG	= 22,
+//				ID_R_SHOULDER_ROLL_RIG	= 23,
+//				ID_L_SHOULDER_ROLL_RIG	= 24,
+//				ID_R_ELBOW_RIG		= 25,
+//				ID_L_ELBOW_RIG		= 26,
+//				ID_MAX			= 26,
+//				NUMBER_OF_JOINTS	= 27
+
+
+
+//				ID_R_ELBOW_YAW		= 21,
+//				ID_L_ELBOW_YAW		= 22,
+//				ID_R_WRIST_YAW		= 23,
+//				ID_L_WRIST_YAW		= 24,
+//				ID_R_GRIPPER		= 25,
+//				ID_L_GRIPPER		= 26,
+//				ID_TORSO_ROTATE		= 23,
+//				ID_MAX			= 23,
+//				NUMBER_OF_JOINTS	= 24
+
+
 				ID_MAX			= 20,
 				NUMBER_OF_JOINTS	= 21
 			};
 
 			enum
 			{
-				SLOPE_HARD			= 16,
+				SLOPE_HARD		= 16,
 				SLOPE_DEFAULT		= 32,
-				SLOPE_SOFT			= 64,
+				SLOPE_SOFT		= 64,
 				SLOPE_EXTRASOFT		= 128
 			};
 
@@ -79,10 +95,12 @@ namespace Robot
 			int m_IGain[NUMBER_OF_JOINTS];
 			int m_DGain[NUMBER_OF_JOINTS];
 			int m_Temp[NUMBER_OF_JOINTS];
+			int m_Torque[NUMBER_OF_JOINTS];
 
 		public:
 			JointData();
 			~JointData();
+
 
 			void SetEnable(int id, bool enable);
 			void SetEnable(int id, bool enable, bool exclusive);
@@ -128,8 +146,12 @@ namespace Robot
 			void SetDGain(int id, int dgain) { m_DGain[id] = dgain; }
 			int  GetDGain(int id)            { return m_DGain[id]; }
 
-			int GetTemp(int id)									{ return m_Temp[id]; }
-			void SetTemp(int id, int value)			{ m_Temp[id] = value; }
+			int GetTemp(int id)	{ return m_Temp[id]; }
+			void SetTemp(int id, int value)	{ m_Temp[id] = value; }
+
+			void SetTorque(int id, bool enable);
+			int GetTorque(int id);
+
 	};
 }
 

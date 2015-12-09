@@ -66,12 +66,6 @@ void StatusCheck::mPlay(int motion_page, int mode, int wait)
 	return;
 }
 
-void StatusCheck::resetLEDs(CM730 &cm730)
-{
-	cm730.WriteWordDelayed(CM730::P_LED_EYE_L, cm730.MakeColor(3, 3, 3)); //cm730.MakeColor(31,0,18));
-	cm730.WriteWordDelayed(CM730::P_LED_HEAD_L, cm730.MakeColor(1, 1, 1));
-	return;
-}
 
 
 void StatusCheck::Check(CM730 &cm730)

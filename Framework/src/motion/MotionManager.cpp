@@ -12,6 +12,7 @@
 #include "MotionManager.h"
 #include <unistd.h>
 #include <assert.h>
+#include <stdlib.h>
 
 using namespace Robot;
 
@@ -35,7 +36,11 @@ MotionManager::MotionManager() :
     DEBUG_PRINT(false)
 {
     for (int i = 0; i < JointData::NUMBER_OF_JOINTS; i++)
-        m_Offset[i] = 0;
+        {
+            m_Offset[i] = 0;
+            m_Torque[i] = false;
+        }
+
 
 #if LOG_VOLTAGES
     assert((m_voltageLog = fopen("voltage.log", "w")));
@@ -310,9 +315,17 @@ void MotionManager::Process()
             avr = sum / ACCEL_WINDOW_SIZE;
 
             if (avr < MotionStatus::FALLEN_F_LIMIT)
-                MotionStatus::FALLEN = FORWARD;
+                {
+                    MotionStatus::FALLEN = FORWARD;
+//DEBUG:
+//printf( "I've fallen forward\r\n" );
+                }
             else if (avr > MotionStatus::FALLEN_B_LIMIT)
-                MotionStatus::FALLEN = BACKWARD;
+                {
+                    MotionStatus::FALLEN = BACKWARD;
+//DEBUG:
+//printf( "I've fallen backward\r\n" );
+                }
             else
                 MotionStatus::FALLEN = STANDUP;
 
@@ -415,6 +428,22 @@ void MotionManager::SetEnable(bool enable)
         m_CM730->WriteWord(CM730::ID_BROADCAST, MX28::P_MOVING_SPEED_L, 0, 0);
 }
 
+void MotionManager::SetTorque(int id, bool enable)
+{
+    m_Torque[id] = enable;
+    if (m_Torque[id] == true)
+        {
+            m_ArbotixPro->WriteByte(id, MX28::P_TORQUE_ENABLE, 1, 0);
+            fprintf(stderr, "Torque Enabled!\n");
+        }
+    else
+        {
+            m_ArbotixPro->WriteByte(id, MX28::P_TORQUE_ENABLE, 0, 0);
+            fprintf(stderr, "Torque Disabled!\n");
+        }
+}
+
+
 void MotionManager::AddModule(MotionModule *module)
 {
     module->Initialize();
@@ -439,7 +468,7 @@ void MotionManager::SetJointDisable(int index)
 void MotionManager::adaptTorqueToVoltage()
 {
     const int DEST_TORQUE = 1023;
-    const int FULL_TORQUE_VOLTAGE = 130; // 13V - at 13V darwin will make no adaptation as the standard 3 cell battery is always below this voltage, this implies Nimbro-OP runs on 4 cells
+    const int FULL_TORQUE_VOLTAGE = 168; // 13V - at 13V darwin will make no adaptation as the standard 3 cell battery is always below this voltage, this implies Nimbro-OP runs on 4 cells
 
     int voltage;
     // torque is only reduced if it is greater then FULL_TORQUE_VOLTAGE

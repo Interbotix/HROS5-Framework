@@ -38,6 +38,8 @@ namespace Robot
 			bool m_IsThreadRunning;
 			bool m_IsLogging;
 
+			int m_Torque[JointData::NUMBER_OF_JOINTS];
+
 			std::ofstream m_LogFileStream;
 
 			AngleEstimator m_angleEstimator;
@@ -70,6 +72,8 @@ namespace Robot
 			bool GetEnable()				{ return m_Enabled; }
 			void AddModule(MotionModule *module);
 			void RemoveModule(MotionModule *module);
+
+			void SetTorque(int id, bool enable);
 
 			void ResetGyroCalibration() { m_CalibrationStatus = 0; m_FBGyroCenter = 512; m_RLGyroCenter = 512; }
 			int GetCalibrationStatus() { return m_CalibrationStatus; }

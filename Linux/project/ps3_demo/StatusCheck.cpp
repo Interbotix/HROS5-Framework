@@ -30,6 +30,9 @@ int StatusCheck::m_is_started   = 0;
 int StatusCheck::m_current_walk_speed = FAST_WALK;
 
 bool bLJState = false, bRJState = false;
+
+
+
 minIni* StatusCheck::m_ini;
 minIni* StatusCheck::m_ini1;
 
@@ -67,7 +70,7 @@ void StatusCheck::Check(CM730 &cm730)
 		 if(MotionStatus::FALLEN != STANDUP && (m_cur_mode == SOCCER) && m_is_started == 1)
 	   	{
 	     Walking::GetInstance()->Stop();
-		 	resetLEDs(cm730);
+
 		 	while(Walking::GetInstance()->IsRunning() == 1) usleep(8000);
 
 	     Action::GetInstance()->m_Joint.SetEnableBody(true, true);
@@ -89,7 +92,6 @@ void StatusCheck::Check(CM730 &cm730)
 //////////////////////////////////////////////////////////////////////////////////////
 	if (PS3.key.Cross != 0)
 		{
-			resetLEDs(cm730);
 			Walking::GetInstance()->Stop();
 			while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
 			m_is_started    = 0;
@@ -115,7 +117,6 @@ void StatusCheck::Check(CM730 &cm730)
 				{
 					cm730.DXLPowerOn(true);
 				}
-			resetLEDs(cm730);
 			Walking::GetInstance()->Stop();
 			while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
 			int lastMode = m_cur_mode;
@@ -307,7 +308,8 @@ void StatusCheck::Check(CM730 &cm730)
 
 	if (Walking::GetInstance()->IsRunning() == true)
 		{
-			int rx, ry, dead_band = 6;
+			int rx = 128, ry = 128;
+			int dead_band = 5;
 			double FBStep = 0, RLTurn = 0, RLStep = 0, xd, yd;
 			static double speedAdjSum = 0;
 
@@ -328,7 +330,7 @@ void StatusCheck::Check(CM730 &cm730)
 					RLTurn = 60 * xd;
 					FBStep = 70 * yd;
 //				fprintf(stderr, " (yd:%.1f)\n", yd);
-					Walking::GetInstance()->HIP_PITCH_OFFSET = Walking::GetInstance()->HIP_PITCH_OFFSET_START + yd / 2;
+//				Walking::GetInstance()->HIP_PITCH_OFFSET = Walking::GetInstance()->HIP_PITCH_OFFSET_START + yd / 2;
 					if (FBStep < 0)
 						{
 							FBStep = 45 * yd;
@@ -370,8 +372,9 @@ void StatusCheck::Check(CM730 &cm730)
 
 	if (Walking::GetInstance()->IsRunning() == true && PS3.key.Down != 0)
 		{
+			printf("\r");
 			fprintf(stderr, "STOPPING WALKING GAIT\n");
-			resetLEDs(cm730);
+
 			Walking::GetInstance()->Stop();
 			while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
 		}
@@ -385,6 +388,7 @@ void StatusCheck::Check(CM730 &cm730)
 		{
 			if (m_cur_mode == WALK_READY)
 				{
+					printf("\r");
 					fprintf(stderr, "STARTING WALKING GAIT\n");
 					Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
 					Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
@@ -463,7 +467,8 @@ void StatusCheck::Check(CM730 &cm730)
 
 	if ((PS3BallFollower::GetInstance()->bHeadAuto == false && (m_cur_mode == WALK_READY || m_cur_mode == SITTING)) )
 		{
-			int lx, ly, dead_band = 6;
+			int lx = 128, ly = 128;
+			int dead_band = 5;
 			double pan, tilt;
 			pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
 			tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
@@ -516,12 +521,5 @@ void StatusCheck::mPlay(int motion_page, int mode, int wait)
 					Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
 				}
 		}
-	return;
-}
-
-void StatusCheck::resetLEDs(CM730 &cm730)
-{
-	cm730.WriteWordDelayed(CM730::P_LED_EYE_L, cm730.MakeColor(3, 3, 3)); //cm730.MakeColor(31,0,18));
-	cm730.WriteWordDelayed(CM730::P_LED_HEAD_L, cm730.MakeColor(1, 1, 1));
 	return;
 }
