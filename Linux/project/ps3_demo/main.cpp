@@ -71,13 +71,12 @@ int main(int argc, char *argv[])
 	MotionManager::GetInstance()->AddModule((MotionModule*)Action::GetInstance());
 	MotionManager::GetInstance()->AddModule((MotionModule*)Head::GetInstance());
 	MotionManager::GetInstance()->AddModule((MotionModule*)Walking::GetInstance());
-	//MotionManager::GetInstance()->StartThread();
-	//LinuxMotionTimer::Initialize(MotionManager::GetInstance());
+
 	LinuxMotionTimer linuxMotionTimer;
 	linuxMotionTimer.Initialize(MotionManager::GetInstance());
 	linuxMotionTimer.Start();
 	/////////////////////////////////////////////////////////////////////
-//	MotionManager::GetInstance()->LoadINISettings(ini);
+
 
 	int firm_ver = 0, retry = 0;
 	//important but allow a few retries
@@ -97,33 +96,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "Wrong firmware version %d!! \n\n", JointData::ID_HEAD_PAN);
 			exit(0);
 		}
-	//conversion! ////////////////
-	/*
-	Action::GetInstance()->LoadFile("../../../Data/motion.bin");
-	int j,k,p,a;
-	double f;
-	for(k=0;k<Action::MAXNUM_PAGE;k++)
-		{
-		Action::GetInstance()->LoadPage(k, &Page);
-		for(j=0;j<Action::MAXNUM_STEP;j++)
-			{
-			for(p=0;p<31;p++)
-				{
-				a = Page.step[j].position[p];
-				if(a < 1024)
-					{
-					f = ((a-512)*10)/3+2048;
-					a = (int)f;
-					if(a<0) a =0;
-					if(a>4095) a = 4095;
-					Page.step[j].position[p] = a;
-					}
-				}
-			}
-		Action::GetInstance()->SavePage(k, &Page);
-		}
-	exit(0);
-	*/
+
 	//copy page ////////////////
 	if (argc > 1 && strcmp(argv[1], "-copy") == 0)
 		{
@@ -159,20 +132,7 @@ int main(int argc, char *argv[])
 					exit(0);
 				}
 		}
-	/////////////////////////////
-	/*
-	    Walking::GetInstance()->m_Joint.SetEnableBody(true,true);
-	    MotionManager::GetInstance()->SetEnable(true);
 
-			Walking::GetInstance()->LoadINISettings(m_ini);
-
-	    arbotixpro.WriteByte(ArbotixPro::P_LED_PANNEL, 0x01|0x02|0x04, NULL);
-
-	    PS3Controller_Start();
-			LinuxActionScript::PlayMP3("../../../Data/mp3/ready.mp3");
-	    Action::GetInstance()->Start(15);
-	    while(Action::GetInstance()->IsRunning()) usleep(8*1000);
-	*/
 	Walking::GetInstance()->LoadINISettings(ini);
 	MotionManager::GetInstance()->LoadINISettings(ini);
 
@@ -199,6 +159,7 @@ int main(int argc, char *argv[])
 	else
 		{
 			Action::GetInstance()->Start(15);
+			StatusCheck::m_cur_mode = SITTING;
 			while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 		}
 	while (1)
@@ -236,8 +197,8 @@ int GetCurrentPosition(ArbotixPro &arbotixpro)
 				}
 		}
 	// compare to a couple poses
-	// first sitting - page 48
-	Action::GetInstance()->LoadPage(48, &Page);
+	// first sitting - page 15
+	Action::GetInstance()->LoadPage(15, &Page);
 	j = Page.header.stepnum - 1;
 	dMaxAngle1 = dMaxAngle2 = dMaxAngle3 = 0;
 	for (p = 0; p < 6; p++)
@@ -249,8 +210,8 @@ int GetCurrentPosition(ArbotixPro &arbotixpro)
 			if (dAngle > dMaxAngle1)
 				dMaxAngle1 = dAngle;
 		}
-	// squating - page 15
-	Action::GetInstance()->LoadPage(15, &Page);
+	// Standing - page 1
+	Action::GetInstance()->LoadPage(1, &Page);
 	j = Page.header.stepnum - 1;
 	for (int p = 0; p < 6; p++)
 		{
@@ -278,8 +239,8 @@ int GetCurrentPosition(ArbotixPro &arbotixpro)
 	if (dMaxAngle2 < 20 && dMaxAngle2 < dMaxAngle1 && dMaxAngle2 < dMaxAngle3)
 		m = Robot::READY;
 	if (dMaxAngle3 < 20 && dMaxAngle3 < dMaxAngle1 && dMaxAngle3 < dMaxAngle2)
-		m = Robot::SOCCER;
-	printf("Sitting = %d, Squating = %d, Standing = %d\n", dMaxAngle1, dMaxAngle2, dMaxAngle3);
-	printf("Robot is %s\n", m == Robot::READY ? "Ready" : m == Robot::SOCCER ? "Soccer" : m == Robot::SITTING ? "Sitting" : "None");
+		m = Robot::WALK_READY;
+	printf("Sitting = %d, Standing = %d, Walk Ready = %d\n", dMaxAngle1, dMaxAngle2, dMaxAngle3);
+	printf("Robot is %s\n", m == Robot::READY ? "Standing" : m == Robot::WALK_READY ? "Walk Ready" : m == Robot::SITTING ? "Sitting" : "None");
 	return m;
 }

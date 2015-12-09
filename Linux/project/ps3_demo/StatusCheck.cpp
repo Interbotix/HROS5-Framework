@@ -67,7 +67,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 // IMU AUTO GETUP ROUTINE
 //////////////////////////////////////////////////////////////////////////////////////
 	/*
-		 if(MotionStatus::FALLEN != STANDUP && (m_cur_mode == SOCCER) && m_is_started == 1)
+		 if(MotionStatus::FALLEN != STANDUP && (m_cur_mode == WALK_READY) && m_is_started == 1)
 	   	{
 	     Walking::GetInstance()->Stop();
 
@@ -515,11 +515,11 @@ void StatusCheck::mPlay(int motion_page, int mode, int wait)
 	if (wait == WAIT)
 		{
 			while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-			if (mode != SITTING && mode != STAIRS)
-				{
-					Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-					Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-				}
+			// if (mode != SITTING && mode != STAIRS)
+			// 	{
+			// 		Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+			// 		Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+			// 	}
 		}
 	return;
 }

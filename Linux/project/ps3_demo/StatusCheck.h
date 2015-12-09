@@ -32,9 +32,7 @@ namespace Robot
 		SOCCER,
 		WALK_READY,
 		ACTION,
-		MOTION,
 		VISION,
-		STAIRS,
 		MAX_MODE
 	};
 
