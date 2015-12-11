@@ -39,11 +39,11 @@ void JointData::SetEnable(int id, bool enable)
 
 void JointData::SetEnable(int id, bool enable, bool exclusive)
 {
-    if (enable && exclusive)
+    if (enable && exclusive) 
 	{
     	MotionManager::GetInstance()->SetJointDisable(id);
-    	m_Enable[id] = enable;
 	}
+    m_Enable[id] = enable;
 }
 
 void JointData::SetEnableHeadOnly(bool enable)
