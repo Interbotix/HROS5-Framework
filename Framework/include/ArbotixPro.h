@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _ARBOTIX_PRO_H_
-#define _ARBOTIX_PRO_H_
+#ifndef _ARBOTIXPRO_H_
+#define _ARBOTIXPRO_H_
 
 #include "MXDXL.h"
 
@@ -41,6 +41,7 @@ namespace Robot
 			virtual void ClearPort() = 0;
 			virtual int WritePort(unsigned char* packet, int numPacket) = 0;
 			virtual int ReadPort(unsigned char* packet, int numPacket) = 0;
+			virtual void FlushPort() = 0;
 
 			// Using semaphore
 			virtual void LowPriorityWait() = 0;
@@ -202,7 +203,6 @@ namespace Robot
 			static int MakeWord(int lowbyte, int highbyte);
 			static int GetLowByte(int word);
 			static int GetHighByte(int word);
-
 	};
 }
 
