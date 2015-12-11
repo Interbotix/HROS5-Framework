@@ -114,33 +114,36 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 	if (PS3.key.Triangle != 0)
 		{
-			if (m_is_started == 0)
+			if (LinuxActionScript::m_is_running == 0)
 				{
-					arbotixpro.DXLPowerOn(true);
-				}
-			if (Walking::GetInstance()->IsRunning() == true)
-				{
-					Walking::GetInstance()->Stop();
-					while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
-				}
-			int lastMode = m_cur_mode;
-			m_cur_mode = WALK_READY;
-			MotionManager::GetInstance()->Reinitialize();
-			MotionManager::GetInstance()->SetEnable(true);
-			m_is_started = 1;
-			bLJState = bRJState = false;
-			Head::GetInstance()->m_Joint.SetEnableBody(false);
-			Walking::GetInstance()->m_Joint.SetEnableBody(false);
-			Action::GetInstance()->m_Joint.SetEnableBody(true);
+					if (m_is_started == 0)
+						{
+							arbotixpro.DXLPowerOn(true);
+						}
+					if (Walking::GetInstance()->IsRunning() == true)
+						{
+							Walking::GetInstance()->Stop();
+							while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+						}
+					int lastMode = m_cur_mode;
+					m_cur_mode = WALK_READY;
+					MotionManager::GetInstance()->Reinitialize();
+					MotionManager::GetInstance()->SetEnable(true);
+					m_is_started = 1;
+					bLJState = bRJState = false;
+					Head::GetInstance()->m_Joint.SetEnableBody(false);
+					Walking::GetInstance()->m_Joint.SetEnableBody(false);
+					Action::GetInstance()->m_Joint.SetEnableBody(true);
 
-			Action::GetInstance()->Start(9); //9 WALK READY STANCE
-			while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-			usleep(500);
-			Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true);
-			Action::GetInstance()->m_Joint.SetEnableBody(false);
-			usleep(100);
-			Head::GetInstance()->m_Joint.SetEnableHeadOnly(true);
-			while (PS3.key.Triangle != 0) usleep(8000);
+					Action::GetInstance()->Start(9); //9 WALK READY STANCE
+					while (Action::GetInstance()->IsRunning() == true) usleep(8000);
+					usleep(500);
+					Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true);
+					Action::GetInstance()->m_Joint.SetEnableBody(false);
+					usleep(100);
+					Head::GetInstance()->m_Joint.SetEnableHeadOnly(true);
+					while (PS3.key.Triangle != 0) usleep(8000);
+				}
 		}
 
 
@@ -150,7 +153,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 
 	//Make sure we aren't walking currently.
-	if (m_cur_mode != WALKING)
+	if (m_cur_mode == WALK_READY || m_cur_mode == ACTION)
 		{
 
 //////////////////////////////////////////////////////////////////////////////////////
