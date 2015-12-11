@@ -21,7 +21,7 @@
 
 #define INI_FILE_PATH       ((char *)"../../../Data/config.ini")
 
-#define M_INI	((char *)"../../../Data/slow-walk.ini")
+#define M_INI	((char *)"../../../Data/configSMOOTH.ini")
 
 
 #define U2D_DEV_NAME0       "/dev/ttyUSB0"
@@ -47,13 +47,15 @@ int main(int argc, char *argv[])
 {
 	int trackerSel;
 	change_current_dir();
-
+	StatusCheck::m_cur_mode = INITIAL;
 	minIni* ini = new minIni(INI_FILE_PATH);
 	minIni* ini1 = new minIni(M_INI);
 	StatusCheck::m_ini = ini;
 	StatusCheck::m_ini1 = ini1;
 
 	//////////////////// Framework Initialize ////////////////////////////
+	printf("Framework initialized.\n");
+
 	if (MotionManager::GetInstance()->Initialize(&arbotixpro) == false)
 		{
 			linux_arbotixpro.SetPortName(U2D_DEV_NAME1);
@@ -63,14 +65,18 @@ int main(int argc, char *argv[])
 					return 0;
 				}
 		}
+	printf("MotionManager initialized.\n");
 
 	Walking::GetInstance()->LoadINISettings(ini);
+	printf("Walking configuration loaded.\n");
 	usleep(100);
 	MotionManager::GetInstance()->LoadINISettings(ini);
+	//printf("Offset configuration loaded.");
 
 	MotionManager::GetInstance()->AddModule((MotionModule*)Action::GetInstance());
 	MotionManager::GetInstance()->AddModule((MotionModule*)Head::GetInstance());
 	MotionManager::GetInstance()->AddModule((MotionModule*)Walking::GetInstance());
+	printf("Action, Head, & Walking MotionModules loaded.\n");
 
 	LinuxMotionTimer linuxMotionTimer;
 	linuxMotionTimer.Initialize(MotionManager::GetInstance());
@@ -90,6 +96,7 @@ int main(int argc, char *argv[])
 	if (0 < firm_ver && firm_ver < 40)
 		{
 			Action::GetInstance()->LoadFile(MOTION_FILE_PATH);
+			printf("RME Motion File Loaded.\n");
 		}
 	else
 		{
@@ -145,7 +152,9 @@ int main(int argc, char *argv[])
 
 
 	if (PS3Controller_Start() == 0)
-		printf("PS3 controller not installed.\n");
+		{
+			printf("PS3 controller not installed.\n");
+		}
 
 	//determine current position
 	StatusCheck::m_cur_mode = GetCurrentPosition(arbotixpro);
@@ -153,11 +162,13 @@ int main(int argc, char *argv[])
 	if ((argc > 1 && strcmp(argv[1], "-off") == 0) || (StatusCheck::m_cur_mode == SITTING))
 		{
 			arbotixpro.DXLPowerOn(false);
+			printf("Robot detected in sitting position, powering down Dynamixels.\n");
 			//for(int id=JointData::ID_R_SHOULDER_PITCH; id<JointData::NUMBER_OF_JOINTS; id++)
 			//	arbotixpro.WriteByte(id, MXDXL::P_TORQUE_ENABLE, 0, 0);
 		}
 	else
 		{
+			printf("Sitting Down.\n");
 			Action::GetInstance()->Start(15);
 			StatusCheck::m_cur_mode = SITTING;
 			while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
@@ -175,7 +186,7 @@ int main(int argc, char *argv[])
 
 int GetCurrentPosition(ArbotixPro &arbotixpro)
 {
-	int m = Robot::READY, p, j, pos[31];
+	int m = StatusCheck::m_cur_mode, p, j, pos[31];
 	int dMaxAngle1, dMaxAngle2, dMaxAngle3;
 	double dAngle;
 	int rl[6] = { JointData::ID_R_ANKLE_ROLL, JointData::ID_R_ANKLE_PITCH, JointData::ID_R_KNEE, JointData::ID_R_HIP_PITCH, JointData::ID_R_HIP_ROLL, JointData::ID_R_HIP_YAW };
@@ -237,10 +248,10 @@ int GetCurrentPosition(ArbotixPro &arbotixpro)
 	if (dMaxAngle1 < 20 && dMaxAngle1 < dMaxAngle2 && dMaxAngle1 < dMaxAngle3)
 		m = Robot::SITTING;
 	if (dMaxAngle2 < 20 && dMaxAngle2 < dMaxAngle1 && dMaxAngle2 < dMaxAngle3)
-		m = Robot::READY;
+		m = Robot::ACTION;
 	if (dMaxAngle3 < 20 && dMaxAngle3 < dMaxAngle1 && dMaxAngle3 < dMaxAngle2)
 		m = Robot::WALK_READY;
 	printf("Sitting = %d, Standing = %d, Walk Ready = %d\n", dMaxAngle1, dMaxAngle2, dMaxAngle3);
-	printf("Robot is %s\n", m == Robot::READY ? "Standing" : m == Robot::WALK_READY ? "Walk Ready" : m == Robot::SITTING ? "Sitting" : "None");
+	printf("Robot is %s\n", m == Robot::ACTION ? "Standing" : m == Robot::WALK_READY ? "Walk Ready" : m == Robot::SITTING ? "Sitting" : "None");
 	return m;
 }

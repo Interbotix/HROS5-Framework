@@ -27,10 +27,10 @@ namespace Robot
 	enum
 	{
 		INITIAL,
-		READY,
 		SITTING,
 		SOCCER,
 		WALK_READY,
+		WALKING,
 		ACTION,
 		VISION,
 		MAX_MODE
