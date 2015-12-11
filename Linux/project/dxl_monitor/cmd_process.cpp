@@ -71,7 +71,7 @@ const char *GetIDString(int id)
 			return "HEAD_TILT";
 
 		case ArbotixPro::ID_CM:
-			return "SUB_BOARD";
+			return "ARBOTIX_PRO";
 
 //	case JointData::ID_TORSO_ROTATE:
 //		return "TORSO_ROTATE";

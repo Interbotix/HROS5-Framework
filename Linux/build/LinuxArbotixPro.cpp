@@ -144,6 +144,12 @@ void LinuxArbotixPro::ClosePort()
 	m_Socket_fd = -1;
 }
 
+void LinuxArbotixPro::FlushPort()
+{
+	if (m_Socket_fd != -1)
+		tcdrain(m_Socket_fd);
+}
+
 void LinuxArbotixPro::ClearPort()
 {
 	tcflush(m_Socket_fd, TCIFLUSH);

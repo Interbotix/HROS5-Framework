@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _LINUX_ArbotixPro_H_
-#define _LINUX_ArbotixPro_H_
+#ifndef _LINUX_ARBOTIXPRO_H_
+#define _LINUX_ARBOTIXPRO_H_
 
 #include <semaphore.h>
 #include "ArbotixPro.h"
@@ -47,6 +47,7 @@ namespace Robot
 			void ClearPort();
 			int WritePort(unsigned char* packet, int numPacket);
 			int ReadPort(unsigned char* packet, int numPacket);
+			void FlushPort();
 
 			void LowPriorityWait();
 			void MidPriorityWait();
