@@ -22,7 +22,7 @@ const int DEST_TORQUE = 1023;
 
 //#define LOG_VOLTAGES 1
 
-#define CM730_COMPATIBLE
+//#define CM730_COMPATIBLE
 
 MotionManager* MotionManager::m_UniqueInstance = new MotionManager();
 
