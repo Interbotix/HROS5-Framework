@@ -13,6 +13,8 @@
 #define MAXNUM_TXPARAM      (256)
 #define MAXNUM_RXPARAM      (1024)
 
+#define CM730_COMPATIBLE
+
 namespace Robot
 {
 	class BulkReadData
@@ -109,10 +111,17 @@ namespace Robot
 				P_GYRO_Y_H				= 41,
 				P_GYRO_X_L				= 42,
 				P_GYRO_X_H				= 43,
+#ifdef CM730_COMPATIBLE
+				P_ACCEL_X_L				= 44,
+				P_ACCEL_X_H				= 45,
+				P_ACCEL_Y_L				= 46,
+				P_ACCEL_Y_H				= 47,
+#else
 				P_ACCEL_Y_L				= 44,
 				P_ACCEL_Y_H				= 45,
 				P_ACCEL_X_L				= 46,
 				P_ACCEL_X_H				= 47,
+#endif
 				P_ACCEL_Z_L				= 48,
 				P_ACCEL_Z_H				= 49,
 				P_VOLTAGE				= 50,

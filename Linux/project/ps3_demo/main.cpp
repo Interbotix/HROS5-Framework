@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 	minIni* ini1 = new minIni(M_INI);
 	StatusCheck::m_ini = ini;
 	StatusCheck::m_ini1 = ini1;
+	StatusCheck::m_power_state = 0;
 
 	//////////////////// Framework Initialize ////////////////////////////
 	printf("Framework initialized.\n");
@@ -161,14 +162,18 @@ int main(int argc, char *argv[])
 	//LinuxActionScript::PlayMP3("../../../Data/mp3/ready.mp3");
 	if ((argc > 1 && strcmp(argv[1], "-off") == 0) || (StatusCheck::m_cur_mode == SITTING))
 		{
+			StatusCheck::m_power_state = 0;
 			arbotixpro.DXLPowerOn(false);
 			printf("Robot detected in sitting position, powering down Dynamixels.\n");
+
 			//for(int id=JointData::ID_R_SHOULDER_PITCH; id<JointData::NUMBER_OF_JOINTS; id++)
 			//	arbotixpro.WriteByte(id, MXDXL::P_TORQUE_ENABLE, 0, 0);
 		}
 	else
 		{
-			printf("Sitting Down.\n");
+			printf("Robot detected in Standing or Walk Ready Position.\n");
+			printf("Sitting Down. Dynamixels remain powered on.\n");
+			StatusCheck::m_power_state = 1;
 			Action::GetInstance()->Start(15);
 			StatusCheck::m_cur_mode = SITTING;
 			while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);

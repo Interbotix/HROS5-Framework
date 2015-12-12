@@ -1,4 +1,5 @@
 #!/bin/sh -e
+sudo killall demo &
 sleep 2
 sudo ./demo &
 sleep 3
