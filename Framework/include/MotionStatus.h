@@ -25,8 +25,8 @@ namespace Robot
 		private:
 
 		public:
-			static const int FALLEN_F_LIMIT     = 440;
-			static const int FALLEN_B_LIMIT     = 590;
+			static const int FALLEN_F_LIMIT     = 412;
+			static const int FALLEN_B_LIMIT     = 612;
 			static const int FALLEN_MAX_COUNT   = 30;
 
 			static JointData m_CurrentJoints;

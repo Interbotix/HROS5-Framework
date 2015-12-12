@@ -22,6 +22,8 @@ const int DEST_TORQUE = 1023;
 
 //#define LOG_VOLTAGES 1
 
+#define CM730_COMPATIBLE
+
 MotionManager* MotionManager::m_UniqueInstance = new MotionManager();
 
 MotionManager::MotionManager() :
@@ -287,8 +289,11 @@ void MotionManager::Process()
                     MotionStatus::FB_GYRO = (1.0 - GYRO_ALPHA) * MotionStatus::FB_GYRO + GYRO_ALPHA * gyroValFB;
                     MotionStatus::RL_GYRO = (1.0 - GYRO_ALPHA) * MotionStatus::RL_GYRO + GYRO_ALPHA * gyroValRL;;
                     MotionStatus::RL_ACCEL = m_ArbotixPro->m_BulkReadData[ArbotixPro::ID_CM].ReadWord(ArbotixPro::P_ACCEL_X_L);
+#ifdef CM730_COMPATIBLE
+                    MotionStatus::FB_ACCEL = m_ArbotixPro->m_BulkReadData[ArbotixPro::ID_CM].ReadWord(ArbotixPro::P_ACCEL_Y_L);
+#else
                     MotionStatus::FB_ACCEL = 1024 - m_ArbotixPro->m_BulkReadData[ArbotixPro::ID_CM].ReadWord(ArbotixPro::P_ACCEL_Y_L);
-
+#endif
                     fb_array[buf_idx] = MotionStatus::FB_ACCEL;
 
                     if (++buf_idx >= ACCEL_WINDOW_SIZE) buf_idx = 0;
@@ -318,14 +323,14 @@ void MotionManager::Process()
             if (avr < MotionStatus::FALLEN_F_LIMIT)
                 {
                     MotionStatus::FALLEN = FORWARD;
-//DEBUG:
-//printf( "I've fallen forward\r\n" );
+                    //DEBUG:
+                    printf( "Robot has fallen forward. MotionStatus::FB_ACCEL[%d]\r\n", MotionStatus::FB_ACCEL);
                 }
             else if (avr > MotionStatus::FALLEN_B_LIMIT)
                 {
                     MotionStatus::FALLEN = BACKWARD;
-//DEBUG:
-//printf( "I've fallen backward\r\n" );
+                    //DEBUG:
+                    printf( "Robot has fallen backward. MotionStatus::FB_ACCEL[%d]\r\n", MotionStatus::FB_ACCEL);
                 }
             else
                 MotionStatus::FALLEN = STANDUP;
@@ -435,12 +440,12 @@ void MotionManager::SetTorque(int id, bool enable)
     if (m_Torque[id] == true)
         {
             m_ArbotixPro->WriteByte(id, MXDXL::P_TORQUE_ENABLE, 1, 0);
-            fprintf(stderr, "Torque Enabled!\n");
+            fprintf(stderr, "Torque Enabled on ID[%d]\n", id);
         }
     else
         {
             m_ArbotixPro->WriteByte(id, MXDXL::P_TORQUE_ENABLE, 0, 0);
-            fprintf(stderr, "Torque Disabled!\n");
+            fprintf(stderr, "Torque Disabled on ID[%d]\n", id);
         }
 }
 
@@ -477,7 +482,7 @@ void MotionManager::adaptTorqueToVoltage()
         return;
 
     //Check if voltage has dropped too low; if so kill the servos and issue a poweroff command
-    if ( voltage < 108 )
+    if ( voltage < 118 )
         {
             printf( "MotionManager::adaptTorqueToVoltage: Voltage dropped below safe threshold. Shutting down." );
             m_ArbotixPro->WriteByte(ArbotixPro::ID_BROADCAST, MXDXL::P_TORQUE_ENABLE, 0, 0); //kill torque
