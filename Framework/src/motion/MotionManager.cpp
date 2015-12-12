@@ -22,7 +22,7 @@ const int DEST_TORQUE = 1023;
 
 //#define LOG_VOLTAGES 1
 
-//#define CM730_COMPATIBLE
+#define CM730_COMPATIBLE
 
 MotionManager* MotionManager::m_UniqueInstance = new MotionManager();
 
@@ -323,14 +323,13 @@ void MotionManager::Process()
             if (avr < MotionStatus::FALLEN_F_LIMIT)
                 {
                     MotionStatus::FALLEN = FORWARD;
-                    //DEBUG:
-                    printf( "Robot has fallen forward. MotionStatus::FB_ACCEL[%d]\r\n", MotionStatus::FB_ACCEL);
+                    //DEBUG Note: Upon initialization avr will need to normalize, giving false 'Forward Fall' triggers
+                    //printf( "Robot has fallen forward. MotionStatus::FB_ACCEL[%d] & Average Reading[%d]\r\n", MotionStatus::FB_ACCEL, avr);
                 }
             else if (avr > MotionStatus::FALLEN_B_LIMIT)
                 {
                     MotionStatus::FALLEN = BACKWARD;
-                    //DEBUG:
-                    printf( "Robot has fallen backward. MotionStatus::FB_ACCEL[%d]\r\n", MotionStatus::FB_ACCEL);
+                    //printf( "Robot has fallen backward. MotionStatus::FB_ACCEL[%d] & Average Reading avr[%d]\r\n", MotionStatus::FB_ACCEL, avr);
                 }
             else
                 MotionStatus::FALLEN = STANDUP;

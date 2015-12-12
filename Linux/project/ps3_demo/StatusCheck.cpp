@@ -28,10 +28,20 @@ int StatusCheck::m_cur_mode     = INITIAL;
 int StatusCheck::m_old_btn      = 0;
 int StatusCheck::m_is_started   = 0;
 int StatusCheck::m_current_walk_speed = FAST_WALK;
+int StatusCheck::m_power_state;
 
 bool bLJState = false, bRJState = false;
 
-
+const char* StatusCheck::SCRIPT_FILE_PATH_TRIANGLE = "action_scripts/Triangle.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_CIRCLE = "action_scripts/Circle.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_CROSS = "action_scripts/Cross.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_SQUARE = "action_scripts/Square.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_R1 = "action_scripts/R1.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_R2 = "action_scripts/R2.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_L1 = "action_scripts/L1.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_L2 = "action_scripts/L2.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_SELECT = "action_scripts/SelectButton.asc";
+const char* StatusCheck::SCRIPT_FILE_PATH_START = "action_scripts/StartButton.asc";
 
 minIni* StatusCheck::m_ini;
 minIni* StatusCheck::m_ini1;
@@ -66,46 +76,23 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 // IMU AUTO GETUP ROUTINE
 //////////////////////////////////////////////////////////////////////////////////////
-	/*
-		 if(MotionStatus::FALLEN != STANDUP && (m_cur_mode == WALK_READY) && m_is_started == 1)
-	   	{
-	     Walking::GetInstance()->Stop();
 
-		 	while(Walking::GetInstance()->IsRunning() == 1) usleep(8000);
-
-	     Action::GetInstance()->m_Joint.SetEnableBody(true, true);
-
-	    if(MotionStatus::FALLEN == FORWARD)
-	        Action::GetInstance()->Start(1);   // FORWARD GETUP 10
-	    else if(MotionStatus::FALLEN == BACKWARD)
-	        Action::GetInstance()->Start(1);   // BACKWARD GETUP 11
-	    while(Action::GetInstance()->IsRunning() == 1) usleep(8000);
-
-	    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-	    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-			}
-	*/
-
-
-//////////////////////////////////////////////////////////////////////////////////////
-// Shut it down, sit down.
-//////////////////////////////////////////////////////////////////////////////////////
-	if (PS3.key.Cross != 0)
+	if (MotionStatus::FALLEN != STANDUP && (m_cur_mode == WALKING || m_cur_mode == WALK_READY) && m_is_started == 1)
 		{
-			if (Walking::GetInstance()->IsRunning() == true)
-				{
-					Walking::GetInstance()->Stop();
-					while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
-				}
-			m_is_started    = 0;
-			m_cur_mode      = SITTING;
-			LinuxActionScript::m_stop = 1;
-			Walking::GetInstance()->m_Joint.SetEnableBody(false);
-			Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true);
-			while (Action::GetInstance()->Start(15) == false) usleep(8000);
-			while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-			Head::GetInstance()->m_Joint.SetEnableHeadOnly(true);
-			while (PS3.key.Cross != 0) usleep(8000);
+			Walking::GetInstance()->Stop();
+			while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+
+			Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+
+			if (MotionStatus::FALLEN == FORWARD)
+				//Action::GetInstance()->Start(1);   // FORWARD GETUP 10
+				printf( "Robot has fallen forward.\n");
+			else if (MotionStatus::FALLEN == BACKWARD)
+				//Action::GetInstance()->Start(1);   // BACKWARD GETUP 11
+				printf( "Robot has fallen backward.\n");
+			while (Action::GetInstance()->IsRunning() == 1) usleep(8000);
+			// Go back to Walk Ready
+			mWalkReady(arbotixpro);
 		}
 
 
@@ -114,38 +101,55 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 	if (PS3.key.Triangle != 0)
 		{
-			if (LinuxActionScript::m_is_running == 0)
+			mWalkReady(arbotixpro);
+			while (PS3.key.Triangle != 0) usleep(8000);
+		}
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Shut it down, sit down.
+//////////////////////////////////////////////////////////////////////////////////////
+	if (PS3.key.Cross != 0)
+		{
+			if (m_cur_mode == SITTING)
 				{
-					if (m_is_started == 0)
+					if (m_power_state == 1)
 						{
-							arbotixpro.DXLPowerOn(true);
+							MotionManager::GetInstance()->Reinitialize();
+							MotionManager::GetInstance()->SetEnable(false);
+							arbotixpro.DXLPowerOn(false);
+							printf( "Robot Dynamixel Power Disabled.\n");
+							m_power_state = 0;
+							m_is_started = 0;
 						}
+					else
+						{
+//							MotionManager::GetInstance()->Reinitialize();
+//							MotionManager::GetInstance()->SetEnable(false);
+							arbotixpro.DXLPowerOn(true);
+							printf( "Robot Dynamixel Power Enabled.\n");
+							m_power_state = 1;
+							m_is_started = 1;
+						}
+				}
+			else
+				{
 					if (Walking::GetInstance()->IsRunning() == true)
 						{
 							Walking::GetInstance()->Stop();
 							while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
 						}
-					int lastMode = m_cur_mode;
-					m_cur_mode = WALK_READY;
-					MotionManager::GetInstance()->Reinitialize();
-					MotionManager::GetInstance()->SetEnable(true);
-					m_is_started = 1;
-					bLJState = bRJState = false;
-					Head::GetInstance()->m_Joint.SetEnableBody(false);
+					m_is_started    = 0;
+					m_power_state = 1;
+					m_cur_mode      = SITTING;
+					LinuxActionScript::m_stop = 1;
 					Walking::GetInstance()->m_Joint.SetEnableBody(false);
-					Action::GetInstance()->m_Joint.SetEnableBody(true);
-
-					Action::GetInstance()->Start(9); //9 WALK READY STANCE
+					Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true);
+					while (Action::GetInstance()->Start(15) == false) usleep(8000);
 					while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-					usleep(500);
-					Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true);
-					Action::GetInstance()->m_Joint.SetEnableBody(false);
-					usleep(100);
 					Head::GetInstance()->m_Joint.SetEnableHeadOnly(true);
-					while (PS3.key.Triangle != 0) usleep(8000);
 				}
+			while (PS3.key.Cross != 0) usleep(8000);
 		}
-
 
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -156,175 +160,81 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 	if (m_cur_mode == WALK_READY || m_cur_mode == ACTION)
 		{
 
-//////////////////////////////////////////////////////////////////////////////////////
-// Select
-//////////////////////////////////////////////////////////////////////////////////////
-			if (PS3.key.Select != 0)
-				{
-					if (LinuxActionScript::m_is_running == 0)
-						{
-							m_cur_mode = ACTION;
-							LinuxActionScript::m_stop = 0;
-							Head::GetInstance()->m_Joint.SetEnableBody(false);
-							Walking::GetInstance()->m_Joint.SetEnableBody(false);
-							Action::GetInstance()->m_Joint.SetEnableBody(true);
-							LinuxActionScript::ScriptStart(SCRIPT_FILE_PATH_SELECT);
-							while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-						}
-					while (PS3.key.Select != 0) usleep(8000);
-				}
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////
-// Square
+// Square Button
 //////////////////////////////////////////////////////////////////////////////////////
 			if (PS3.key.Square != 0)
 				{
-					if (LinuxActionScript::m_is_running == 0)
-						{
-							m_cur_mode = ACTION;
-							LinuxActionScript::m_stop = 0;
-							Head::GetInstance()->m_Joint.SetEnableBody(false);
-							Walking::GetInstance()->m_Joint.SetEnableBody(false);
-							Action::GetInstance()->m_Joint.SetEnableBody(true);
-							LinuxActionScript::ScriptStart(SCRIPT_FILE_PATH_SQUARE);
-							while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-						}
+					mAction(SCRIPT_FILE_PATH_SQUARE);
 					while (PS3.key.Square != 0) usleep(8000);
 				}
 
-
 //////////////////////////////////////////////////////////////////////////////////////
-// Circle
+// Circle Button
 //////////////////////////////////////////////////////////////////////////////////////
 			if (PS3.key.Circle != 0)
 				{
-					if (LinuxActionScript::m_is_running == 0)
-						{
-							m_cur_mode = ACTION;
-							LinuxActionScript::m_stop = 0;
-							Head::GetInstance()->m_Joint.SetEnableBody(false);
-							Walking::GetInstance()->m_Joint.SetEnableBody(false);
-							Action::GetInstance()->m_Joint.SetEnableBody(true);
-							LinuxActionScript::ScriptStart(SCRIPT_FILE_PATH_CIRCLE);
-							while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-						}
+					mAction(SCRIPT_FILE_PATH_CIRCLE);
 					while (PS3.key.Circle != 0) usleep(8000);
 				}
 
-
 //////////////////////////////////////////////////////////////////////////////////////
-// R1
+// R1 Button
 //////////////////////////////////////////////////////////////////////////////////////
 			if (PS3.key.R1 != 0)
 				{
-					if (LinuxActionScript::m_is_running == 0)
-						{
-							m_cur_mode = ACTION;
-							LinuxActionScript::m_stop = 0;
-							Head::GetInstance()->m_Joint.SetEnableBody(false);
-							Walking::GetInstance()->m_Joint.SetEnableBody(false);
-							Action::GetInstance()->m_Joint.SetEnableBody(true);
-							LinuxActionScript::ScriptStart(SCRIPT_FILE_PATH_R1);
-							while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-						}
+					mAction(SCRIPT_FILE_PATH_R1);
 					while (PS3.key.R1 != 0) usleep(8000);
 				}
 
-
 //////////////////////////////////////////////////////////////////////////////////////
-// R2
+// R2 Button
 //////////////////////////////////////////////////////////////////////////////////////
 			if (PS3.key.R2 != 0)
 				{
-					if (LinuxActionScript::m_is_running == 0)
-						{
-							m_cur_mode = ACTION;
-							LinuxActionScript::m_stop = 0;
-							Head::GetInstance()->m_Joint.SetEnableBody(false);
-							Walking::GetInstance()->m_Joint.SetEnableBody(false);
-							Action::GetInstance()->m_Joint.SetEnableBody(true);
-							LinuxActionScript::ScriptStart(SCRIPT_FILE_PATH_R2);
-							while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-						}
+					mAction(SCRIPT_FILE_PATH_R2);
 					while (PS3.key.R2 != 0) usleep(8000);
 				}
 
-
 //////////////////////////////////////////////////////////////////////////////////////
-// L1
+// L1 Button
 //////////////////////////////////////////////////////////////////////////////////////
 			if (PS3.key.L1 != 0)
 				{
-					if (LinuxActionScript::m_is_running == 0)
-						{
-							m_cur_mode = ACTION;
-							LinuxActionScript::m_stop = 0;
-							Head::GetInstance()->m_Joint.SetEnableBody(false);
-							Walking::GetInstance()->m_Joint.SetEnableBody(false);
-							Action::GetInstance()->m_Joint.SetEnableBody(true);
-							LinuxActionScript::ScriptStart(SCRIPT_FILE_PATH_L1);
-							while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-						}
+					mAction(SCRIPT_FILE_PATH_L1);
 					while (PS3.key.L1 != 0) usleep(8000);
 				}
 
-
 //////////////////////////////////////////////////////////////////////////////////////
-// L2
+// L2 Button
 //////////////////////////////////////////////////////////////////////////////////////
 			if (PS3.key.L2 != 0)
 				{
-					if (LinuxActionScript::m_is_running == 0)
-						{
-							m_cur_mode = ACTION;
-							LinuxActionScript::m_stop = 0;
-							Head::GetInstance()->m_Joint.SetEnableBody(false);
-							Walking::GetInstance()->m_Joint.SetEnableBody(false);
-							Action::GetInstance()->m_Joint.SetEnableBody(true);
-							LinuxActionScript::ScriptStart(SCRIPT_FILE_PATH_L2);
-							while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-						}
+					mAction(SCRIPT_FILE_PATH_L2);
 					while (PS3.key.L2 != 0) usleep(8000);
 				}
 
 
 //////////////////////////////////////////////////////////////////////////////////////
-// Start
+// Start Button
 //////////////////////////////////////////////////////////////////////////////////////
 			if (PS3.key.Start != 0)
 				{
-					if (LinuxActionScript::m_is_running == 0)
-						{
-							m_cur_mode = ACTION;
-							LinuxActionScript::m_stop = 0;
-							Head::GetInstance()->m_Joint.SetEnableBody(false);
-							Walking::GetInstance()->m_Joint.SetEnableBody(false);
-							Action::GetInstance()->m_Joint.SetEnableBody(true);
-							LinuxActionScript::ScriptStart(SCRIPT_FILE_PATH_START);
-							while (Action::GetInstance()->IsRunning() == true) usleep(8000);
-						}
+					mAction(SCRIPT_FILE_PATH_START);
+					while (PS3.key.Select != 0) usleep(8000);
+				}
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Select Button
+//////////////////////////////////////////////////////////////////////////////////////
+			if (PS3.key.Select != 0)
+				{
+					mAction(SCRIPT_FILE_PATH_SELECT);
 					while (PS3.key.Select != 0) usleep(8000);
 				}
 		}
 
-//////////////////////////////////////////////////////////////////////////////////////
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////
-// STOP WALKING GAIT ENGINE
-//////////////////////////////////////////////////////////////////////////////////////
-
-	if (Walking::GetInstance()->IsRunning() == true && PS3.key.Down != 0)
-		{
-			printf("\r");
-			fprintf(stderr, "STOPPING WALKING GAIT\n");
-			m_cur_mode = WALK_READY;
-			Walking::GetInstance()->Stop();
-			while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
-		}
 //////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -336,7 +246,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 			if (m_cur_mode == WALK_READY)
 				{
 					printf("\r");
-					fprintf(stderr, "STARTING WALKING GAIT\n");
+					fprintf(stderr, "Starting Walking Gait.\n");
 					m_cur_mode = WALKING;
 					Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
 					Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
@@ -346,8 +256,20 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 					Walking::GetInstance()->Start();
 				}
 		}
+
+//////////////////////////////////////////////////////////////////////////////////////
+// STOP WALKING GAIT ENGINE
 //////////////////////////////////////////////////////////////////////////////////////
 
+	if (Walking::GetInstance()->IsRunning() == true && PS3.key.Down != 0)
+		{
+			printf("\r");
+			fprintf(stderr, "Stopping Walking Gait.\n");
+			m_cur_mode = WALK_READY;
+			Walking::GetInstance()->Stop();
+			while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+		}
+//////////////////////////////////////////////////////////////////////////////////////
 
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -449,9 +371,6 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
-
 	/*
 	//////////////////////////////////////////////////////////////////////////////////////
 		// toggle head from auto to not
@@ -511,9 +430,56 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 
 	*/
 
+}
 
+void StatusCheck::mWalkReady(ArbotixPro &arbotixpro)
+{
+	if (LinuxActionScript::m_is_running == 0)
+		{
+			if (m_is_started == 0)
+				{
+					arbotixpro.DXLPowerOn(true);
+				}
+			if (Walking::GetInstance()->IsRunning() == true)
+				{
+					Walking::GetInstance()->Stop();
+					while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
+				}
+			int lastMode = m_cur_mode;
+			m_cur_mode = WALK_READY;
+			printf("Robot is in WALK_READY state.\n");
+			MotionManager::GetInstance()->Reinitialize();
+			MotionManager::GetInstance()->SetEnable(true);
+			m_is_started = 1;
+			bLJState = bRJState = false;
+			Head::GetInstance()->m_Joint.SetEnableBody(false);
+			Walking::GetInstance()->m_Joint.SetEnableBody(false);
+			Action::GetInstance()->m_Joint.SetEnableBody(true);
 
+			Action::GetInstance()->Start(9); //9 WALK READY STANCE
+			while (Action::GetInstance()->IsRunning() == true) usleep(8000);
+			usleep(500);
+			Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true);
+			Action::GetInstance()->m_Joint.SetEnableBody(false);
+			usleep(100);
+			Head::GetInstance()->m_Joint.SetEnableHeadOnly(true);
+		}
+}
 
+void StatusCheck::mAction(const char* scriptfilepath)
+{
+	if (LinuxActionScript::m_is_running == 0)
+		{
+			m_cur_mode = ACTION;
+			printf("Robot is in ACTION state.\n");
+			LinuxActionScript::m_stop = 0;
+			m_is_started = 1;
+			Head::GetInstance()->m_Joint.SetEnableBody(false);
+			Walking::GetInstance()->m_Joint.SetEnableBody(false);
+			Action::GetInstance()->m_Joint.SetEnableBody(true);
+			LinuxActionScript::ScriptStart(scriptfilepath);
+			while (Action::GetInstance()->IsRunning() == true) usleep(8000);
+		}
 }
 
 void StatusCheck::mPlay(int motion_page, int mode, int wait)

@@ -11,16 +11,6 @@
 #include "ArbotixPro.h"
 #include "minIni.h"
 
-#define SCRIPT_FILE_PATH_TRIANGLE    "action_scripts/Triangle.asc"
-#define SCRIPT_FILE_PATH_CIRCLE   "action_scripts/Circle.asc"
-#define SCRIPT_FILE_PATH_CROSS   "action_scripts/Cross.asc"
-#define SCRIPT_FILE_PATH_SQUARE   "action_scripts/Square.asc"
-#define SCRIPT_FILE_PATH_R1   "action_scripts/R1.asc"
-#define SCRIPT_FILE_PATH_R2   "action_scripts/R2.asc"
-#define SCRIPT_FILE_PATH_L1   "action_scripts/L1.asc"
-#define SCRIPT_FILE_PATH_L2   "action_scripts/L2.asc"
-#define SCRIPT_FILE_PATH_SELECT   "action_scripts/SelectButton.asc"
-#define SCRIPT_FILE_PATH_START	"action_scripts/StartButton.asc"
 
 namespace Robot
 {
@@ -60,16 +50,27 @@ namespace Robot
 		private:
 			static int m_old_btn;
 			static void mPlay(int motion_page, int mode = SOCCER, int wait = WAIT);
-			static void resetLEDs(ArbotixPro &arbotixpro);
+			static void mWalkReady(ArbotixPro &arbotixpro);
+			static void mAction(const char* scriptfilepath);
+			static const char* SCRIPT_FILE_PATH_TRIANGLE;
+			static const char* SCRIPT_FILE_PATH_CIRCLE;
+			static const char* SCRIPT_FILE_PATH_CROSS;
+			static const char* SCRIPT_FILE_PATH_SQUARE;
+			static const char* SCRIPT_FILE_PATH_R1;
+			static const char* SCRIPT_FILE_PATH_R2;
+			static const char* SCRIPT_FILE_PATH_L1;
+			static const char* SCRIPT_FILE_PATH_L2;
+			static const char* SCRIPT_FILE_PATH_SELECT;
+			static const char* SCRIPT_FILE_PATH_START;
+
 		public:
 			static int m_cur_mode;
 			static int m_is_started;
 			static int m_current_walk_speed;
+			static int m_power_state;
 			static minIni* m_ini;
 			static minIni* m_ini1;
-
 			static void Check(ArbotixPro &arbotixpro);
-
 	};
 }
 #endif /* STATUSCHECK_H_ */
