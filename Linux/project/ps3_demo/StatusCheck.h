@@ -71,6 +71,7 @@ namespace Robot
 			static minIni* m_ini;
 			static minIni* m_ini1;
 			static void Check(ArbotixPro &arbotixpro);
+			static void DeadBand( int p_deadband, int p_value );
 	};
 }
 #endif /* STATUSCHECK_H_ */
