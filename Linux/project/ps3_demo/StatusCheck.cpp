@@ -48,6 +48,26 @@ minIni* StatusCheck::m_ini1;
 
 //#define Southpaw
 
+int StatusCheck::DeadBand( int p_deadband, int p_value )
+{
+	if ( p_value > 0 )
+	{
+		if ( p_value - p_deadband > 0 )
+		{
+			return p_value - p_deadband;
+		}
+		else return 0;
+	}
+	else if ( p_value < 0 )
+	{
+		if ( p_value + p_deadband < 0 )
+		{
+			return p_value + p_deadband;
+		} else return 0;
+	}
+	return 0;
+}
+
 void StatusCheck::Check(ArbotixPro &arbotixpro)
 {
 	int value = 0;
@@ -280,7 +300,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 	if (Walking::GetInstance()->IsRunning() == true)
 		{
 			int rx = 128, ry = 128;
-			int dead_band = 5;
+			int dead_band = 7;
 			double FBStep = 0, RLTurn = 0, RLStep = 0, xd, yd;
 			static double speedAdjSum = 0;
 
@@ -292,12 +312,14 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 			ry = -(PS3.key.LJoyY - 128);
 #endif
 
+			rx = DeadBand( dead_band, rx );
+			ry = DeadBand( dead_band, ry );
 //			fprintf(stderr, " (X:%d Y:%d)\n", rx, ry);
 
-			if (abs(rx) > dead_band || abs(ry) > dead_band)
+			if (abs(rx) > 0 || abs(ry) > 0)
 				{
-					xd = (double)(rx - dead_band) / 256;
-					yd = (double)(ry - dead_band) / 256;
+					xd = (double)rx / 256;
+					yd = (double)ry / 256;
 					RLTurn = 60 * xd;
 					FBStep = 70 * yd;
 //				fprintf(stderr, " (yd:%.1f)\n", yd);
@@ -343,7 +365,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 	if ((PS3BallFollower::GetInstance()->bHeadAuto == false && (m_cur_mode == WALK_READY || m_cur_mode == SITTING || m_cur_mode == WALKING)) )
 		{
 			int lx = 128, ly = 128;
-			int dead_band = 5;
+			int dead_band = 7;
 			double pan, tilt;
 			pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
 			tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
@@ -357,13 +379,17 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 			ly = -(PS3.key.RJoyY - 128);
 #endif
 
-			if (abs(lx) > dead_band || abs(ly) > dead_band)
-				{
-					pos.X = pan + 0.2 * Camera::VIEW_V_ANGLE * (lx - dead_band) / 256;
-					pos.Y = tilt + 0.2 * Camera::VIEW_H_ANGLE * (ly - dead_band) / 256;
-				}
-			Head::GetInstance()->MoveByAngle(pos.X, pos.Y);
-			//Head::GetInstance()->MoveTracking(pos);
+			lx = DeadBand( dead_band, lx );
+			ly = DeadBand( dead_band, ly );
+
+			if (abs(lx) > 0 || abs(ly) > 0)
+			{
+				pos.X = pan + 0.2 * Camera::VIEW_V_ANGLE * lx / 256;
+				pos.Y = tilt + 0.2 * Camera::VIEW_H_ANGLE * ly / 256;
+
+				Head::GetInstance()->MoveByAngle(pos.X, pos.Y);
+				//Head::GetInstance()->MoveTracking(pos);
+			}
 		}
 
 
