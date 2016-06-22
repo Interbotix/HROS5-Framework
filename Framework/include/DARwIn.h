@@ -9,6 +9,7 @@
 #define _DARWIN_H_
 
 #include "ArbotixPro.h"
+#include "UM7.h"
 #include "MXDXL.h"
 #include "MotionModule.h"
 #include "MotionManager.h"
@@ -32,5 +33,6 @@
 #include "PS3BallFollower.h"
 #include "LineFollower.h"
 #include "RobotFollower.h"
+
 
 #endif

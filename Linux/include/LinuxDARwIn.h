@@ -11,6 +11,7 @@
 #include "DARwIn.h"
 #include "LinuxMotionTimer.h"
 #include "LinuxArbotixPro.h"
+#include "LinuxUM7.h"
 #include "LinuxCamera.h"
 #include "LinuxNetwork.h"
 #include "LinuxActionScript.h"

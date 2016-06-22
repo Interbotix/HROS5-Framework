@@ -20,6 +20,7 @@ CXXFLAGS += -fPIC -shared -O2 -DLINUX -D_GNU_SOURCE -Wall -g $(INCLUDE_DIRS)
 LFLAGS += -g -lpthread -ldl -lbluetooth -lncurses
 
 OBJS =  ../../Framework/src/ArbotixPro.o     	\
+		../../Framework/src/UM7.o     	\
         ../../Framework/src/math/Matrix.o   \
         ../../Framework/src/math/Plane.o    \
         ../../Framework/src/math/Point.o    \
@@ -52,6 +53,7 @@ OBJS =  ../../Framework/src/ArbotixPro.o     	\
         LinuxActionScript.o   \
         LinuxCamera.o   \
         LinuxArbotixPro.o    \
+        LinuxUM7.o    \
         LinuxMotionTimer.o    \
         LinuxNetwork.o
 

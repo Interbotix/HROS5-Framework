@@ -97,41 +97,41 @@ int ArbotixPro::TxRxPacket(unsigned char *txpacket, unsigned char *rxpacket, int
 			fprintf(stderr, "INST: ");
 			switch (txpacket[INSTRUCTION])
 				{
-				case INST_PING:
-					fprintf(stderr, "PING\n");
-					break;
+					case INST_PING:
+						fprintf(stderr, "PING\n");
+						break;
 
-				case INST_READ:
-					fprintf(stderr, "READ\n");
-					break;
+					case INST_READ:
+						fprintf(stderr, "READ\n");
+						break;
 
-				case INST_WRITE:
-					fprintf(stderr, "WRITE\n");
-					break;
+					case INST_WRITE:
+						fprintf(stderr, "WRITE\n");
+						break;
 
-				case INST_REG_WRITE:
-					fprintf(stderr, "REG_WRITE\n");
-					break;
+					case INST_REG_WRITE:
+						fprintf(stderr, "REG_WRITE\n");
+						break;
 
-				case INST_ACTION:
-					fprintf(stderr, "ACTION\n");
-					break;
+					case INST_ACTION:
+						fprintf(stderr, "ACTION\n");
+						break;
 
-				case INST_RESET:
-					fprintf(stderr, "RESET\n");
-					break;
+					case INST_RESET:
+						fprintf(stderr, "RESET\n");
+						break;
 
-				case INST_SYNC_WRITE:
-					fprintf(stderr, "SYNC_WRITE\n");
-					break;
+					case INST_SYNC_WRITE:
+						fprintf(stderr, "SYNC_WRITE\n");
+						break;
 
-				case INST_BULK_READ:
-					fprintf(stderr, "BULK_READ\n");
-					break;
+					case INST_BULK_READ:
+						fprintf(stderr, "BULK_READ\n");
+						break;
 
-				default:
-					fprintf(stderr, "UNKNOWN\n");
-					break;
+					default:
+						fprintf(stderr, "UNKNOWN\n");
+						break;
 				}
 		}
 
@@ -344,33 +344,33 @@ int ArbotixPro::TxRxPacket(unsigned char *txpacket, unsigned char *rxpacket, int
 			fprintf(stderr, "RETURN: ");
 			switch (res)
 				{
-				case SUCCESS:
-					fprintf(stderr, "SUCCESS\n");
-					break;
+					case SUCCESS:
+						fprintf(stderr, "SUCCESS\n");
+						break;
 
-				case TX_CORRUPT:
-					fprintf(stderr, "TX_CORRUPT\n");
-					break;
+					case TX_CORRUPT:
+						fprintf(stderr, "TX_CORRUPT\n");
+						break;
 
-				case TX_FAIL:
-					fprintf(stderr, "TX_FAIL\n");
-					break;
+					case TX_FAIL:
+						fprintf(stderr, "TX_FAIL\n");
+						break;
 
-				case RX_FAIL:
-					fprintf(stderr, "RX_FAIL\n");
-					break;
+					case RX_FAIL:
+						fprintf(stderr, "RX_FAIL\n");
+						break;
 
-				case RX_TIMEOUT:
-					fprintf(stderr, "RX_TIMEOUT\n");
-					break;
+					case RX_TIMEOUT:
+						fprintf(stderr, "RX_TIMEOUT\n");
+						break;
 
-				case RX_CORRUPT:
-					fprintf(stderr, "RX_CORRUPT\n");
-					break;
+					case RX_CORRUPT:
+						fprintf(stderr, "RX_CORRUPT\n");
+						break;
 
-				default:
-					fprintf(stderr, "UNKNOWN\n");
-					break;
+					default:
+						fprintf(stderr, "UNKNOWN\n");
+						break;
 				}
 		}
 
