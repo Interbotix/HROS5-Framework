@@ -8,6 +8,7 @@
 #ifndef UM7_H
 #define UM7_H
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -50,7 +51,7 @@ namespace Robot
 	{
 
 		public:
-			short roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate;
+			double roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate;
 
 			//UM7();
 
@@ -61,8 +62,10 @@ namespace Robot
 			bool Connect();
 			void Disconnect();
 
-		private:
+			void configure_sensor();
+			bool request_angles();
 
+		private:
 			int state = 0;
 
 			enum {STATE_ZERO, STATE_S, STATE_SN, STATE_SNP, STATE_PT, STATE_DATA, STATE_CHK1, STATE_CHK0};
