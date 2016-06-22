@@ -13,7 +13,7 @@
 #define MAXNUM_TXPARAM      (256)
 #define MAXNUM_RXPARAM      (1024)
 
-#define CM730_COMPATIBLE
+//#define CM730_COMPATIBLE
 
 namespace Robot
 {

@@ -2,7 +2,7 @@
  *   UM7.cpp
  *
  *   Author: ROBOTIS, Interbotix
- *
+ *	Based on library found here: https://github.com/mikehoyer/UM7-Arduino
  */
 
 #include "UM7.h"
