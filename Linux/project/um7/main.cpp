@@ -12,7 +12,7 @@ int main()
 	printf( "\n===== UM7 Demo for DARwIn =====\n\n");
 
 	//////////////////////////// Framework Initialize ////////////////////////////
-	LinuxUM7 	linux_um7( "/dev/um7" );
+	LinuxUM7 	linux_um7( "/dev/ttyUSB1" );
 	UM7 		um7( &linux_um7 );
 
 	if ( um7.Connect() == false )

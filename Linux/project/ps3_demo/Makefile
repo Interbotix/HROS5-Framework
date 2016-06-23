@@ -12,7 +12,7 @@ TARGET = demo
 INCLUDE_DIRS = -I../../include -I../../../Framework/include
 
 CXX = g++
-CXXFLAGS += -g -O2 -DLINUX -Wall $(INCLUDE_DIRS)
+CXXFLAGS += -g -O2 -DLINUX -Wall $(INCLUDE_DIRS) -std=c++11
 #CXXFLAGS += -O2 -DDEBUG -DLINUX -Wall $(INCLUDE_DIRS)
 LFLAGS += -g -lpthread -ljpeg -lrt -lbluetooth
 

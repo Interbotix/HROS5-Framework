@@ -11,7 +11,7 @@ TARGET = dxl_monitor
 
 CXX = g++
 INCLUDE_DIRS = -I../../include -I../../../Framework/include
-CXXFLAGS +=	-O2 -DLINUX -g -Wall -fmessage-length=0 $(INCLUDE_DIRS)
+CXXFLAGS +=	-O2 -DLINUX -g -Wall -fmessage-length=0 $(INCLUDE_DIRS) -std=c++11
 LIBS += -lpthread -lrt
 
 OBJS =	./cmd_process.o	\
