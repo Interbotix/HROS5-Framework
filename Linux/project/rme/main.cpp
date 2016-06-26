@@ -10,7 +10,7 @@
 #include "PS3Controller.h"
 
 
-#define MOTION_FILE_PATH    "../../../Data/motion_4096.bin"
+#define MOTION_FILE_PATH    "../../../Data/soccer_4096.bin"
 
 
 using namespace Robot;
