@@ -27,8 +27,8 @@ namespace Robot
 			static constexpr double LEG_SIDE_OFFSET = 47.5; //mm
 			static constexpr double THIGH_LENGTH = 126.5; //mm
 			static constexpr double CALF_LENGTH = 126.5; //mm
-			static constexpr double ANKLE_LENGTH = 42.0; //mm
-			static constexpr double LEG_LENGTH = 295.0; //mm (THIGH_LENGTH + CALF_LENGTH + ANKLE_LENGTH)
+			static constexpr double ANKLE_LENGTH = 65.0; //mm
+			static constexpr double LEG_LENGTH = 318.0; //mm (THIGH_LENGTH + CALF_LENGTH + ANKLE_LENGTH)
 
 			~Kinematics();
 

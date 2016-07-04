@@ -105,11 +105,17 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 			Action::GetInstance()->m_Joint.SetEnableBody(true, true);
 
 			if (MotionStatus::FALLEN == FORWARD)
-				//Action::GetInstance()->Start(1);   // FORWARD GETUP 10
+			{
+				usleep(1000);
+				Action::GetInstance()->Start(70);   // FORWARD GETUP 10
 				printf( "Robot has fallen forward.\n");
+			}
 			else if (MotionStatus::FALLEN == BACKWARD)
-				//Action::GetInstance()->Start(1);   // BACKWARD GETUP 11
+			{
+				usleep(1000);
+				Action::GetInstance()->Start(75);   // BACKWARD GETUP 11
 				printf( "Robot has fallen backward.\n");
+			}
 			while (Action::GetInstance()->IsRunning() == 1) usleep(8000);
 			// Go back to Walk Ready
 			mWalkReady(arbotixpro);
@@ -299,9 +305,9 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 
 	if (Walking::GetInstance()->IsRunning() == true)
 		{
-			int rx = 128, ry = 128;
+			int rx = 128, ry = 128, rxx = 128; 
 			int dead_band = 7;
-			double FBStep = 0, RLTurn = 0, RLStep = 0, xd, yd;
+			double FBStep = 0, RLTurn = 0, RLStep = 0, xd, yd, xxd;
 			static double speedAdjSum = 0;
 
 #ifdef Southpaw
@@ -310,19 +316,25 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 #else
 			rx = -(PS3.key.LJoyX - 128);
 			ry = -(PS3.key.LJoyY - 128);
+			rxx = (PS3.key.RJoyX -128);
 #endif
 
 			rx = DeadBand( dead_band, rx );
 			ry = DeadBand( dead_band, ry );
-//			fprintf(stderr, " (X:%d Y:%d)\n", rx, ry);
+			rxx = DeadBand( dead_band, rxx);
+//			fprintf(stderr, " (X:%d Y:%d RXX:%d)\n", rx, ry, rxx);
 
-			if (abs(rx) > 0 || abs(ry) > 0)
+			if (abs(rx) > 0 || abs(ry) > 0 || abs(rxx) > 0 )
 				{
 					xd = (double)rx / 256;
 					yd = (double)ry / 256;
-					RLTurn = 60 * xd;
+					xxd = (double)rxx / 256;
+//					RLTurn = 60 * xd;
+					RLTurn = -10 * xxd;
+
 					FBStep = 70 * yd;
-//				fprintf(stderr, " (yd:%.1f)\n", yd);
+					RLStep = 80 * xxd;
+//				fprintf(stderr, " (xxd:%.1f)\n", xxd);
 //				Walking::GetInstance()->HIP_PITCH_OFFSET = Walking::GetInstance()->HIP_PITCH_OFFSET_START + yd / 2;
 					if (FBStep < 0)
 						{
@@ -351,7 +363,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 			Walking::GetInstance()->X_MOVE_AMPLITUDE = FBStep;
 			Walking::GetInstance()->Y_MOVE_AMPLITUDE = RLStep;
 			Walking::GetInstance()->A_MOVE_AMPLITUDE = RLTurn;
-//			fprintf(stderr, " (FB:%.1f RL:%.1f)\n", FBStep, RLTurn);
+			fprintf(stderr, " (FB:%.1f RLTurn:%.1f RLStep:%.1f)\n", FBStep, RLTurn, RLStep);
 		}
 	else //things only done in auto mode
 		{
@@ -361,7 +373,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 // PS3 Head Control
 //////////////////////////////////////////////////////////////////////////////////////
-
+/*
 	if ((PS3BallFollower::GetInstance()->bHeadAuto == false && (m_cur_mode == WALK_READY || m_cur_mode == SITTING || m_cur_mode == WALKING)) )
 		{
 			int lx = 128, ly = 128;
@@ -391,7 +403,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 				//Head::GetInstance()->MoveTracking(pos);
 			}
 		}
-
+*/
 
 
 //////////////////////////////////////////////////////////////////////////////////////

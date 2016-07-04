@@ -17,7 +17,8 @@
 #include "StatusCheck.h"
 
 
-#define MOTION_FILE_PATH    ((char *)"../../../Data/motion_4096.bin")
+//#define MOTION_FILE_PATH    ((char *)"../../../Data/motion_4096.bin")
+#define MOTION_FILE_PATH    ((char *)"../../../Data/soccer_4096.bin")
 
 #define INI_FILE_PATH       ((char *)"../../../Data/config.ini")
 
