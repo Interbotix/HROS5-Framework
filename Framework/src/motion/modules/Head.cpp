@@ -24,10 +24,10 @@ Head::Head()
 	m_Tilt_p_gain = 0.1;
 	m_Tilt_d_gain = 0.22;
 
-	m_LeftLimit = 70;
-	m_RightLimit = -70;
-	m_TopLimit = Kinematics::EYE_TILT_OFFSET_ANGLE;
-	m_BottomLimit = Kinematics::EYE_TILT_OFFSET_ANGLE - 65;
+	m_LeftLimit = 34; //0.6 rad
+	m_RightLimit = -34; //-0.6 rad
+	m_TopLimit = Kinematics::EYE_TILT_OFFSET_ANGLE + 22; //32 deg, 0.57 rad
+	m_BottomLimit = Kinematics::EYE_TILT_OFFSET_ANGLE - 30; //-20 deg, -0.35 rad
 
 	m_Pan_Home = 0;
 	m_Tilt_Home = Kinematics::EYE_TILT_OFFSET_ANGLE - 30.0;
