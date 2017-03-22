@@ -17,14 +17,12 @@ namespace Robot
 	enum
 	{
 		INITIAL,
-		READY,
 		SITTING,
 		SOCCER,
-		LINE_FOLLOWING,
-		ROBOT_FOLLOWING,
-		MOTION,
+		WALK_READY,
+		WALKING,
+		ACTION,
 		VISION,
-		STAIRS,
 		MAX_MODE
 	};
 

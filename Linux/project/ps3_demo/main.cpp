@@ -256,7 +256,7 @@ int GetCurrentPosition(ArbotixPro &arbotixpro)
 		m = Robot::ACTION;
 	if (dMaxAngle3 < 20 && dMaxAngle3 < dMaxAngle1 && dMaxAngle3 < dMaxAngle2)
 		m = Robot::WALK_READY;
-	printf("Sitting = %d, Squating = %d, Standing = %d\n", dMaxAngle1, dMaxAngle2, dMaxAngle3);
-	printf("Robot is %s\n", m == Robot::READY ? "Ready" : m == Robot::SOCCER ? "Soccer" : m == Robot::SITTING ? "Sitting" : "None");
+	printf("Sitting = %d, Standing = %d, Walk Ready = %d\n", dMaxAngle1, dMaxAngle2, dMaxAngle3);
+	printf("Robot is %s\n", m == Robot::ACTION ? "Standing" : m == Robot::WALK_READY ? "Walk Ready" : m == Robot::SITTING ? "Sitting" : "None");
 	return m;
 }
