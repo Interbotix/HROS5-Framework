@@ -46,6 +46,14 @@ const char* StatusCheck::SCRIPT_FILE_PATH_START = "action_scripts/StartButton.as
 minIni* StatusCheck::m_ini;
 minIni* StatusCheck::m_ini1;
 
+bool robotInStandby = false;
+
+bool ToggleRobotStandby(void)
+{
+	robotInStandby = robotInStandby ? false : true;
+	return robotInStandby;
+}
+
 //#define Southpaw
 
 int StatusCheck::DeadBand( int p_deadband, int p_value )
@@ -69,28 +77,39 @@ int StatusCheck::DeadBand( int p_deadband, int p_value )
 	return 0;
 }
 
-void StatusCheck::Check(ArbotixPro &arbotixpro)
+
+void StatusCheck::Check(LinuxJoy &ljoy, ArbotixPro &arbotixpro)
 {
-	int value = 0;
+	// Call off to joystick to get the current status.
+	if (ljoy.readMsgs() <= 0)
+	{
+		// Did not get any message, so delay a bit...
+		usleep(8000);
+	}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // System Standby Toggle
 //////////////////////////////////////////////////////////////////////////////////////
-	if (PS3.key.PS != 0)
+	if (ljoy.buttonPressed(JOYSTICK_BUTTONS::PS))
 	{
+		printf("PS button pressed. Standby Mode has been toggled\n");
 		if (Walking::GetInstance()->IsRunning() == true)
 		{
 			Walking::GetInstance()->Stop();
 			while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
 		}
-		if (ToggleRobotStandby() == 1)
-		{
-			//LinuxActionScript::PlayMP3("../../../Data/mp3/standby.mp3");
-		}
-		// wait for key release
-		while (PS3.key.PS != 0) usleep(8000);
+		ToggleRobotStandby();
+		printf("Robot Standby Mode Active: ");
+		printf(robotInStandby ? "true" : "false\n");
+		usleep(8000);
+		//while (ljoy.buttonPressed(JOYSTICK_BUTTONS::PS) != 0) usleep(8000);
 	}
-	if (robotInStandby == 1) return;
+
+	if (robotInStandby == 1)
+	{
+		usleep(8000);
+		return;
+	}
 
 
 
@@ -120,16 +139,15 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 // Start Walk Ready
 //////////////////////////////////////////////////////////////////////////////////////
-	if (PS3.key.Triangle != 0)
+	if (ljoy.buttonPressed(JOYSTICK_BUTTONS::TRI))
 	{
 		mWalkReady(arbotixpro);
-		while (PS3.key.Triangle != 0) usleep(8000);
 	}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Shut it down, sit down.
 //////////////////////////////////////////////////////////////////////////////////////
-	if (PS3.key.Cross != 0)
+	if (ljoy.buttonPressed(JOYSTICK_BUTTONS::X))
 	{
 		if (m_cur_mode == SITTING)
 		{
@@ -169,7 +187,6 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 			while (Action::GetInstance()->IsRunning() == true) usleep(8000);
 			Head::GetInstance()->m_Joint.SetEnableHeadOnly(true);
 		}
-		while (PS3.key.Cross != 0) usleep(8000);
 	}
 
 
@@ -185,74 +202,74 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 // Square Button
 //////////////////////////////////////////////////////////////////////////////////////
-		if (PS3.key.Square != 0)
+		if (ljoy.buttonPressed(JOYSTICK_BUTTONS::SQUARE))
 		{
 			mAction(SCRIPT_FILE_PATH_SQUARE);
-			while (PS3.key.Square != 0) usleep(8000);
+
 		}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Circle Button
 //////////////////////////////////////////////////////////////////////////////////////
-		if (PS3.key.Circle != 0)
+		if (ljoy.buttonPressed(JOYSTICK_BUTTONS::CIRCLE))
 		{
 			mAction(SCRIPT_FILE_PATH_CIRCLE);
-			while (PS3.key.Circle != 0) usleep(8000);
+
 		}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // R1 Button
 //////////////////////////////////////////////////////////////////////////////////////
-		if (PS3.key.R1 != 0)
+		if (ljoy.buttonPressed(JOYSTICK_BUTTONS::R1))
 		{
 			mAction(SCRIPT_FILE_PATH_R1);
-			while (PS3.key.R1 != 0) usleep(8000);
+
 		}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // R2 Button
 //////////////////////////////////////////////////////////////////////////////////////
-		if (PS3.key.R2 != 0)
+		if (ljoy.buttonPressed(JOYSTICK_BUTTONS::R2))
 		{
 			mAction(SCRIPT_FILE_PATH_R2);
-			while (PS3.key.R2 != 0) usleep(8000);
+
 		}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // L1 Button
 //////////////////////////////////////////////////////////////////////////////////////
-		if (PS3.key.L1 != 0)
+		if (ljoy.buttonPressed(JOYSTICK_BUTTONS::L1))
 		{
 			mAction(SCRIPT_FILE_PATH_L1);
-			while (PS3.key.L1 != 0) usleep(8000);
+
 		}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // L2 Button
 //////////////////////////////////////////////////////////////////////////////////////
-		if (PS3.key.L2 != 0)
+		if (ljoy.buttonPressed(JOYSTICK_BUTTONS::L2))
 		{
 			mAction(SCRIPT_FILE_PATH_L2);
-			while (PS3.key.L2 != 0) usleep(8000);
+
 		}
 
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Start Button
 //////////////////////////////////////////////////////////////////////////////////////
-		if (PS3.key.Start != 0)
+		if (ljoy.buttonPressed(JOYSTICK_BUTTONS::START_SHARE))
 		{
 			mAction(SCRIPT_FILE_PATH_START);
-			while (PS3.key.Select != 0) usleep(8000);
+
 		}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Select Button
 //////////////////////////////////////////////////////////////////////////////////////
-		if (PS3.key.Select != 0)
+		if (ljoy.buttonPressed(JOYSTICK_BUTTONS::SELECT_OPT))
 		{
 			mAction(SCRIPT_FILE_PATH_SELECT);
-			while (PS3.key.Select != 0) usleep(8000);
+
 		}
 	}
 
@@ -262,7 +279,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 //////////////////////////////////////////////////////////////////////////////////////
 // START WALKING GAIT ENGINE
 //////////////////////////////////////////////////////////////////////////////////////
-	if (Walking::GetInstance()->IsRunning() == false && PS3.key.Up != 0)
+	if (Walking::GetInstance()->IsRunning() == false && ljoy.buttonPressed(JOYSTICK_BUTTONS::D_UP))
 	{
 		if (m_cur_mode == WALK_READY)
 		{
@@ -282,7 +299,7 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 // STOP WALKING GAIT ENGINE
 //////////////////////////////////////////////////////////////////////////////////////
 
-	if (Walking::GetInstance()->IsRunning() == true && PS3.key.Down != 0)
+	if (Walking::GetInstance()->IsRunning() == true && ljoy.buttonPressed(JOYSTICK_BUTTONS::D_DOWN))
 	{
 		printf("\r");
 		fprintf(stderr, "Stopping Walking Gait.\n");
@@ -306,11 +323,11 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 		static double speedAdjSum = 0;
 
 #ifdef Southpaw
-		rx = -(PS3.key.RJoyX - 128);
-		ry = -(PS3.key.RJoyY - 128);
+		rx = ljoy.axis(JOYSTICK_AXES::LX) / 256;
+		ry = -(ljoy.axis(JOYSTICK_AXES::LY) / 256);
 #else
-		rx = -(PS3.key.LJoyX - 128);
-		ry = -(PS3.key.LJoyY - 128);
+		rx = ljoy.axis(JOYSTICK_AXES::LX) / 256;
+		ry = -(ljoy.axis(JOYSTICK_AXES::LY) / 256);
 #endif
 
 		rx = DeadBand( dead_band, rx );
@@ -373,11 +390,11 @@ void StatusCheck::Check(ArbotixPro &arbotixpro)
 		Point2D pos = Point2D(pan, tilt);
 
 #ifdef Southpaw
-		lx = -(PS3.key.LJoyX - 128);
-		ly = -(PS3.key.LJoyY - 128);
+		lx = -(ljoy.axis(JOYSTICK_AXES::RX) / 256);
+		ly = -(ljoy.axis(JOYSTICK_AXES::RY) / 256);
 #else
-		lx = -(PS3.key.RJoyX - 128);
-		ly = -(PS3.key.RJoyY - 128);
+		lx = -(ljoy.axis(JOYSTICK_AXES::RX) / 256);
+		ly = -(ljoy.axis(JOYSTICK_AXES::RY) / 256);
 #endif
 
 		lx = DeadBand( dead_band, lx );
