@@ -10,19 +10,21 @@
 
 #include "ArbotixPro.h"
 #include "minIni.h"
-
+#include "JoystickController.h"
 
 namespace Robot
 {
 	enum
 	{
 		INITIAL,
+		READY,
 		SITTING,
 		SOCCER,
-		WALK_READY,
-		WALKING,
-		ACTION,
+		LINE_FOLLOWING,
+		ROBOT_FOLLOWING,
+		MOTION,
 		VISION,
+		STAIRS,
 		MAX_MODE
 	};
 
@@ -70,7 +72,7 @@ namespace Robot
 			static int m_power_state;
 			static minIni* m_ini;
 			static minIni* m_ini1;
-			static void Check(ArbotixPro &arbotixpro);
+			static void Check(LinuxJoy &ljoy, ArbotixPro &arbotixpro);
 			static int DeadBand( int p_deadband, int p_value );
 	};
 }
