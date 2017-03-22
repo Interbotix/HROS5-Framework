@@ -97,7 +97,7 @@ void PS3Controller_Stop();
 byte PS3KeyChanged(void);
 void ClearPS3Keys(void);
 void SetPS3LEDFlashRate(int rate);
-int ToggleRobotStandby(void);
+bool ToggleRobotStandby(void);
 void PS3Vibrate(void);
 
 #endif
