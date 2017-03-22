@@ -176,14 +176,14 @@ int main(int argc, char *argv[])
 		while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 	}
 
-	if ( arbotixpro.WriteWord(ArbotixPro::ID_BROADCAST, AXDXL::P_MOVING_SPEED_L, 1023, 0) != ArbotixPro::SUCCESS )
+	if ( arbotixpro.WriteWord(ArbotixPro::ID_BROADCAST, MXDXL::P_MOVING_SPEED_L, 1023, 0) != ArbotixPro::SUCCESS )
 	{
 		printf( "Warning: TODO\r\n");
 	}
 
 	while (1)
 	{
-		StatusCheck::Check(arbotixpro);
+		StatusCheck::Check(ljoy, arbotixpro);
 	}
 
 	return 0;
