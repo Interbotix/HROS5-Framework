@@ -88,7 +88,8 @@ typedef union
 
 extern volatile _PS3 PS3;
 extern volatile _JKeys JKeys;
-extern volatile int bPS3Active, gLeftJoyStickEnable, gRightJoyStickEnable, robotInStandby, gJoyIMUMixEnable;
+extern volatile int bPS3Active, gLeftJoyStickEnable, gRightJoyStickEnable, gJoyIMUMixEnable;
+extern volatile bool robotInStandby;
 
 int PS3Controller_Start();
 void PS3Controller_Stop();
