@@ -322,13 +322,8 @@ void StatusCheck::Check(LinuxJoy &ljoy, ArbotixPro &arbotixpro)
 		double FBStep = 0, RLTurn = 0, RLStep = 0, xd, yd;
 		static double speedAdjSum = 0;
 
-#ifdef Southpaw
-		rx = ljoy.axis(JOYSTICK_AXES::LX) / 256;
+		rx = -(ljoy.axis(JOYSTICK_AXES::LX) / 256);
 		ry = -(ljoy.axis(JOYSTICK_AXES::LY) / 256);
-#else
-		rx = ljoy.axis(JOYSTICK_AXES::LX) / 256;
-		ry = -(ljoy.axis(JOYSTICK_AXES::LY) / 256);
-#endif
 
 		rx = DeadBand( dead_band, rx );
 		ry = DeadBand( dead_band, ry );
